@@ -1,0 +1,39 @@
+/* The outer container sets up the 3D perspective */
+.flip-container {
+    perspective: 1000px;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    background-color: #f0f0f0;
+  }
+  
+  /* The flipper is the inner element that will rotate */
+  .flipper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: 0.6s;
+    transform-style: preserve-3d;
+  }
+  
+  /* When the flip class is added, we rotate the flipper 180 degrees */
+  .flip-container.flip .flipper {
+    transform: rotateY(180deg);
+  }
+  
+  /* Both faces fill the container, are absolutely positioned, and hide their backface */
+  .front, .back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+  }
+  
+  /* The back face is rotated so that it is hidden until the flip occurs */
+  .back {
+    transform: rotateY(180deg);
+  }
