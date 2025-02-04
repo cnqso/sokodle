@@ -1,5 +1,5 @@
-export type coords = { x: number, y: number };
-export type vector = { dx: number, dy: number };
+export type Coords = { x: number, y: number };
+export type Vector = { dx: number, dy: number };
 
 
 export const keyMap = {
@@ -13,4 +13,6 @@ export const keyMap = {
   d: { dx: 1, dy: 0 },
 }
 
-export type arrowKey = keyof typeof keyMap
+export type ArrowKey = keyof typeof keyMap
+export type GameState = "notPlaying" | "playing" | "won"
+export type FinalScore = {time: number, steps: number}

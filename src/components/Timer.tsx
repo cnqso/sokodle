@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from "react";
+import { FinalScore } from "../types";
 
 export default function StopWatch({
-  playing, setFinalTime
+  playing, moves, setFinalScore
 }: {
   playing: "notPlaying" | "playing" | "won";
-  setFinalTime: React.Dispatch<React.SetStateAction<number>>
+  moves: number;
+  setFinalScore: React.Dispatch<React.SetStateAction<FinalScore | null>>
 }) {
   const [mm, setMm] = useState(0);
   const [ss, setSs] = useState(0);
@@ -35,7 +37,7 @@ export default function StopWatch({
       if (timerRef.current !== null) {
         clearInterval(timerRef.current);
         timerRef.current = null; // Reset to null to avoid type mismatch
-        setFinalTime(ms+(ss*100)+(mm*6000));
+        setFinalScore({ time: (ms + (ss * 100) + (mm * 6000)), steps: moves });
       }
     }
   }, [playing]);
@@ -43,9 +45,12 @@ export default function StopWatch({
   const format = (num: number) => (num < 10 ? `0${num}` : num);
 
   return (
-    <div className="stop-watch">
-        <span>{format(mm)}</span>:<span>{format(ss)}</span>:
-        <span>{format(ms)}</span>
+    <div>
+    {playing !== "won" && <div className="stop-watch">
+      <span>{format(mm)}</span>:<span>{format(ss)}</span>:
+      <span>{format(ms)}</span>
+      <span>{"        "}</span><span style={{ float: "right" }}>{moves} moves</span>
+    </div>}
     </div>
   );
 }

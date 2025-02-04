@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { coords, keyMap, vector, arrowKey } from "../types";
+import { Coords, keyMap, Vector, ArrowKey, FinalScore, GameState } from "../types";
 import Timer from "./Timer";
+import { Button } from "./ui/button";
 
-function findPlayerStart(mapData: number[][]): coords {
+function findPlayerStart(mapData: number[][]): Coords {
   for (let y = 0; y < mapData.length; y++) {
     for (let x = 0; x < mapData[y].length; x++) {
       if (mapData[y][x] === 4) {
@@ -14,17 +15,20 @@ function findPlayerStart(mapData: number[][]): coords {
 }
 
 export default function Sokoban({
-  mapData,
+  mapData, playing, setPlaying, setFinalScore
 }: {
   mapData: number[][];
+  playing: GameState;
+  setPlaying: React.Dispatch<React.SetStateAction<GameState>>;
+  setFinalScore: React.Dispatch<React.SetStateAction<FinalScore | null>>;
 }) {
-  const initialBoxes: coords[] = [];
+  const initialBoxes: Coords[] = [];
   mapData.forEach((row, y) => {
     row.forEach((cell, x) => {
       if (cell === 2) initialBoxes.push({ x, y });
     });
   });
-  const playerStart: coords = findPlayerStart(mapData);
+  const playerStart: Coords = findPlayerStart(mapData);
     
   const validKeys = Object.keys(keyMap);
   const [playerPosition, setPlayerPosition] = useState(playerStart);
@@ -33,14 +37,11 @@ export default function Sokoban({
     { player: playerStart, boxes: initialBoxes },
   ]);
   const [currentStep, setCurrentStep] = useState(0);
-  const [playing, setPlaying] = useState<"notPlaying" | "playing" | "won">(
-    "notPlaying"
-  );
-  const [finalTime, setFinalTime] = useState(0);
+
 
   // Static elements
   const [walls] = useState(() => {
-    const w: coords[] = [];
+    const w: Coords[] = [];
     mapData.forEach((row, y) => {
       row.forEach((cell, x) => {
         if (cell === 1) w.push({ x, y });
@@ -49,7 +50,7 @@ export default function Sokoban({
     return w;
   });
   const [goals] = useState(() => {
-    const g: coords[] = [];
+    const g: Coords[] = [];
     mapData.forEach((row, y) => {
       row.forEach((cell, x) => {
         if (cell === 3) g.push({ x, y });
@@ -84,51 +85,114 @@ export default function Sokoban({
     setCurrentStep(prevStep);
   };
 
-  function handleMove(direction: vector) {
-      
-      if (playing == "won") return;
-      if (playing === "notPlaying") {
-        setPlaying("playing");
+  function handleMove(direction: Vector) {
+    if (playing === "won") return;
+    if (playing === "notPlaying") {
+      setPlaying("playing");
+    }
+  
+    const newX = playerPosition.x + direction.dx;
+    const newY = playerPosition.y + direction.dy;
+  
+    // 1. Check if the next cell is a wall.
+    if (walls.some((w) => w.x === newX && w.y === newY)) {
+      return; // Cannot move into walls.
+    }
+
+
+  
+    // 2. Check if there is at least one box in the next cell.
+    const firstBoxIndex = boxes.findIndex((b) => b.x === newX && b.y === newY);
+  
+    // If there is NO box at that cell, we can move freely.
+    if (firstBoxIndex === -1) {
+      movePlayerWithoutBoxes(newX, newY);
+      return;
+    }
+  
+    // 3. If there IS a box, gather the consecutive boxes (the chain) in that direction.
+    const boxChainIndices: number[] = [];
+    let currentCheckX = newX;
+    let currentCheckY = newY;
+  
+    while (true) {
+      const boxIndex = boxes.findIndex(
+        (b) => b.x === currentCheckX && b.y === currentCheckY
+      );
+      if (boxIndex === -1) {
+        break; // No more boxes in a row.
       }
-
-      const newX = playerPosition.x + direction.dx;
-      const newY = playerPosition.y + direction.dy;
-
-      // Wall collision check
-      if (walls.some((w) => w.x === newX && w.y === newY)) return;
-
-      // Box interaction
-      const boxIndex = boxes.findIndex((b) => b.x === newX && b.y === newY);
-      let newBoxes = [...boxes];
-
-      if (boxIndex !== -1) {
-        const nextBoxX = newX + direction.dx;
-        const nextBoxY = newY + direction.dy;
-
-        // Validate new box position
-        if (
-          walls.some((w) => w.x === nextBoxX && w.y === nextBoxY) ||
-          newBoxes.some((b) => b.x === nextBoxX && b.y === nextBoxY)
-        ) {
-          return;
-        }
-
-        newBoxes = newBoxes.map((box, i) =>
-          i === boxIndex ? { x: nextBoxX, y: nextBoxY } : box
-        );
-      }
-
-      // Update state
-      const newPlayer = { x: newX, y: newY };
-      setHistory((prev) => {
-        const newHistory = prev.slice(0, currentStepRef.current + 1);
-        newHistory.push({ player: newPlayer, boxes: newBoxes });
-        return newHistory;
-      });
-      setCurrentStep((prev) => prev + 1);
-      setPlayerPosition(newPlayer);
-      setBoxes(newBoxes);
-    };
+  
+      // Add to the chain of boxes.
+      boxChainIndices.push(boxIndex);
+  
+      // Move one step further in the same direction.
+      currentCheckX += direction.dx;
+      currentCheckY += direction.dy;
+    }
+  
+    // Now, boxChainIndices contains the indexes of all consecutive boxes
+    // directly in front of the player in the chosen direction.
+  
+    // 4. Check if the cell after the last box in the chain is free.
+    const lastBoxIndex = boxChainIndices[boxChainIndices.length - 1];
+    const lastBox = boxes[lastBoxIndex];
+    const nextXAfterLastBox = lastBox.x + direction.dx;
+    const nextYAfterLastBox = lastBox.y + direction.dy;
+  
+    // If this next cell is a wall, or is occupied by a box that is
+    // *not* part of the chain, we cannot push.
+    const isWallThere = walls.some(
+      (w) => w.x === nextXAfterLastBox && w.y === nextYAfterLastBox
+    );
+    const otherBoxIndex = boxes.findIndex(
+      (b, i) => b.x === nextXAfterLastBox && b.y === nextYAfterLastBox && !boxChainIndices.includes(i)
+    );
+  
+    if (isWallThere || otherBoxIndex !== -1) {
+      // Can't push the chain forward (blocked).
+      return;
+    }
+  
+    // 5. We can push the entire chain. Do so in *reverse* order so that
+    // we move the last box first, preventing overwrites.
+    const newBoxes = [...boxes];
+    for (let i = boxChainIndices.length - 1; i >= 0; i--) {
+      const idx = boxChainIndices[i];
+      newBoxes[idx] = {
+        x: newBoxes[idx].x + direction.dx,
+        y: newBoxes[idx].y + direction.dy,
+      };
+    }
+  
+    // 6. Move the player into the first box’s old spot.
+    const newPlayer = { x: newX, y: newY };
+  
+    // 7. Update state (player, boxes, history).
+    setHistory((prev) => {
+      const newHistory = prev.slice(0, currentStepRef.current + 1);
+      newHistory.push({ player: newPlayer, boxes: newBoxes });
+      return newHistory;
+    });
+    setCurrentStep((prev) => prev + 1);
+    setPlayerPosition(newPlayer);
+    setBoxes(newBoxes);
+  }
+  
+  /**
+   * Helper to move the player if no boxes are involved in the move.
+   */
+  function movePlayerWithoutBoxes(newX: number, newY: number) {
+    const newPlayer = { x: newX, y: newY };
+  
+    setHistory((prev) => {
+      const newHistory = prev.slice(0, currentStepRef.current + 1);
+      newHistory.push({ player: newPlayer, boxes: boxes });
+      return newHistory;
+    });
+    setCurrentStep((prev) => prev + 1);
+    setPlayerPosition(newPlayer);
+  }
 
   // Keyboard controls
   useEffect(() => {
@@ -138,7 +202,7 @@ export default function Sokoban({
         return;
       } else if (validKeys.includes(e.key)) {
 
-        const direction = keyMap[e.key as arrowKey];
+        const direction = keyMap[e.key as ArrowKey];
 
         if (direction) handleMove(direction);
       }
@@ -165,15 +229,10 @@ export default function Sokoban({
 
   return (
     <div>
-      <button onClick={handleUndo} style={{ marginBottom: 10 }}>
+      {playing !== "won" && <Button onClick={handleUndo} style={{ marginBottom: 10 }}>
         Undo (Z)
-      </button>
-      <Timer playing={playing} setFinalTime={setFinalTime}/>
-      {playing == "won" && (
-        <div style={{ color: "green", fontSize: 24, marginBottom: 10 }}>
-          🎉 You Win! 🎉 <span>Final time: {finalTime} Moves: {history.length}</span>
-        </div>
-      )}
+      </Button>}
+      <Timer playing={playing} moves={history.length} setFinalScore={setFinalScore}/>
       <div
         className="grid"
         style={{
