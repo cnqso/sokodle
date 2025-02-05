@@ -282,9 +282,9 @@ export default function Sokoban({
           })
         )}
       </div>
-      {playing !== "won" && <Button onClick={handleUndo} style={{ marginBottom: 10 }}>
+      <Button onClick={handleUndo} style={{ marginBottom: 10 }}>
         Undo (Z)
-      </Button>}
+      </Button>
     </div>
   );
 }

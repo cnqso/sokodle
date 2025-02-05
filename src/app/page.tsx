@@ -45,9 +45,11 @@ export default function Home() {
 
   return (
     <>
-      <Nav />
-      <div style={{ padding: 20 }}>
+
+      <div className="flex flex-col min-h-screen justify-center items-center align-items" style={{ padding: 20 }}>
+        
         <WelcomeModal />
+        <Nav />
         {playing == "won" && (
           <div>
             <div style={{ color: "green", fontSize: 24, marginBottom: 10 }}>
@@ -56,13 +58,13 @@ export default function Home() {
             <div> Time: {finalScore?.time} Moves: {finalScore?.steps}</div>
           </div>
         )}
-        <Card className="max-w-max max-width: max-content;">
+        <Card className="max-w-max max-width: max-content">
           <CardHeader>
             <CardTitle>🍒 Sokodle 📦</CardTitle>
             <CardDescription>Use arrow keys or tap squares to move | Z to undo</CardDescription>
           </CardHeader>
           <CardContent>
-          <Sokoban mapData={exampleMap} playing={playing} setPlaying={setPlaying} setFinalScore={setFinalScore} />
+            <Sokoban mapData={exampleMap} playing={playing} setPlaying={setPlaying} setFinalScore={setFinalScore} />
 
           </CardContent>
         </Card>
