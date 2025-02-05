@@ -1,5 +1,6 @@
+'use client'
 import { useState, useEffect, useRef } from "react";
-import { FinalScore } from "../types";
+import { FinalScore } from "@/lib/types";
 
 export default function StopWatch({
   playing, moves, setFinalScore

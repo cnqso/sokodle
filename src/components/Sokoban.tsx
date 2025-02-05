@@ -1,7 +1,8 @@
+'use client'
 import { useState, useEffect, useRef } from "react";
-import { Coords, keyMap, Vector, ArrowKey, FinalScore, GameState } from "../types";
-import Timer from "./Timer";
-import { Button } from "./ui/button";
+import { Coords, keyMap, Vector, ArrowKey, FinalScore, GameState } from "@/lib/types";
+import Timer from "@/components/Timer";
+import { Button } from "@/components/ui/button";
 
 function findPlayerStart(mapData: number[][]): Coords {
   for (let y = 0; y < mapData.length; y++) {
@@ -229,9 +230,7 @@ export default function Sokoban({
 
   return (
     <div>
-      {playing !== "won" && <Button onClick={handleUndo} style={{ marginBottom: 10 }}>
-        Undo (Z)
-      </Button>}
+
       <Timer playing={playing} moves={history.length} setFinalScore={setFinalScore}/>
       <div
         className="grid"
@@ -283,6 +282,9 @@ export default function Sokoban({
           })
         )}
       </div>
+      {playing !== "won" && <Button onClick={handleUndo} style={{ marginBottom: 10 }}>
+        Undo (Z)
+      </Button>}
     </div>
   );
 }

@@ -1,7 +1,9 @@
+'use client'
+
 import { useState, useEffect } from "react";
-import Sokoban from "./Sokoban";
-import { FinalScore, GameState } from "../types";
-import { Button } from "./ui/button";
+import Sokoban from "@/components/Sokoban";
+import { FinalScore, GameState } from "@/lib/types";
+import { Button } from "@/components/ui/button";
 
 export default function LevelEditor() {
   const [width, setWidth] = useState(7);

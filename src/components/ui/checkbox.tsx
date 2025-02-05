@@ -1,9 +1,11 @@
-'use client'
+"use client"
 
-import * as React from 'react'
-import * as CheckboxPrimitive from '@radix-ui/react-checkbox'
-import { Check } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import * as CheckboxPrimitive from "@radix-ui/react-checkbox"
+import { Check } from "lucide-react"
+
+import * as React from "react"
+
+import { cn } from "@/lib/utils"
 
 const Checkbox = React.forwardRef<
   React.ElementRef<typeof CheckboxPrimitive.Root>,
@@ -11,19 +13,17 @@ const Checkbox = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CheckboxPrimitive.Root
     ref={ref}
-    // Use border classes instead of outline classes
     className={cn(
-      'peer h-4 w-4 shrink-0 border border-gray-300 bg-black ring-offset-white',
-      'focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2',
-      'disabled:cursor-not-allowed disabled:opacity-50',
-      // Fill in and text color when checked
-      'data-[state=checked]:bg-main data-[state=checked]:text-white',
-      className
+      "peer h-4 w-4 shrink-0  outline-2 outline-border ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-main data-[state=checked]:text-white",
+      className,
+      "outline",
     )}
     {...props}
   >
-    <CheckboxPrimitive.Indicator className="flex items-center justify-center text-current">
-      <Check className="h-4 w-4" />
+    <CheckboxPrimitive.Indicator
+      className={cn("flex items-center justify-center text-current")}
+    >
+      <Check color="black" className="h-4 w-4" />
     </CheckboxPrimitive.Indicator>
   </CheckboxPrimitive.Root>
 ))
