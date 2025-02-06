@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LevelEditor from "@/components/LevelEditor";
 
 import Sokoban from "@/components/Sokoban";
@@ -27,27 +27,46 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Button } from "@/components/ui/button";
-
+import Loader from "@/components/Loader";
 
 // Example usage
 export default function Home() {
-  const exampleMap = [
-    [1, 1, 1, 1, 1, 1, 1],
-    [1, 3, 0, 4, 3, 0, 1],
-    [1, 1, 2, 2, 1, 0, 1],
-    [1, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 1, 1],
-  ];
   const [playing, setPlaying] = useState<GameState>(
     "notPlaying"
   );
+
+  const date = new Date().toISOString().split('T')[0];
   const [finalScore, setFinalScore] = useState<FinalScore | null>(null);
+  const [level, setLevel] = useState<number[][] | null>(null);
+  const [levelID, setLevelID] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch(`/api/daily-level?date=${date}`)
+      .then((res) => res.json())
+      .then((data) => { setLevel(data.layout.rows); setLevelID(data.daily_id); })
+  }, [date]);
+
+  async function handleSubmit() {
+    await fetch("/api/attempt", {
+      method: "POST",
+      body: JSON.stringify({ levelID, moves: finalScore?.steps, timeMs: finalScore?.time}),
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+
+  useEffect(() => {
+    if (finalScore?.steps && finalScore?.time && levelID) {
+      const response = handleSubmit();
+      console.log(response)
+    }
+  },[finalScore])
 
   return (
     <>
 
       <div className="flex flex-col min-h-screen justify-center items-center align-items" style={{ padding: 20 }}>
-        
+
         <WelcomeModal />
         <Nav />
         {playing == "won" && (
@@ -64,8 +83,9 @@ export default function Home() {
             <CardDescription>Use arrow keys or tap squares to move | Z to undo</CardDescription>
           </CardHeader>
           <CardContent>
-            <Sokoban mapData={exampleMap} playing={playing} setPlaying={setPlaying} setFinalScore={setFinalScore} />
-
+            { level ?
+            <Sokoban mapData={level} playing={playing} setPlaying={setPlaying} setFinalScore={setFinalScore} />
+            :<Loader width={"400px"} height={"400px"} size={"60px"}/>}
           </CardContent>
         </Card>
       </div>
