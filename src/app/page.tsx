@@ -59,8 +59,29 @@ export default function Home() {
     if (finalScore?.steps && finalScore?.time && levelID) {
       const response = handleSubmit();
       console.log(response)
-    }
+    }  
   },[finalScore])
+
+  useEffect(() => {
+    async function fetchRecentLevels() {
+      try {
+        // Fetch from your route, e.g. offset=0, limit=10 for the first 10
+        const response = await fetch("/api/user-levels?offset=0&limit=10");
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+
+        const data = await response.json();
+
+        // Print the fetched data to the console
+        console.log("Recent Levels:", data);
+      } catch (error) {
+        console.error("Error fetching recent levels:", error);
+      }
+    }
+
+    fetchRecentLevels();
+  }, []);
 
   return (
     <>

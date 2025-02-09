@@ -36,12 +36,16 @@ export async function POST(request) {
     moves < 0 ||
     timeMs < 0
   ) {
-    return new Response(JSON.stringify({ 
-      error: "Missing or invalid fields: levelID, moves, timeMs must be valid integers" 
-    }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({
+        error:
+          "Missing or invalid fields: levelID, moves, timeMs must be valid integers",
+      }),
+      {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }
 
   // Obtain IP address from headers

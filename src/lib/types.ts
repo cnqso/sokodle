@@ -3,7 +3,7 @@ export type Vector = { dx: number, dy: number };
 
 
 export const keyMap = {
-  ArrowUp: { dx: 0, dy: -1 }, 
+  ArrowUp: { dx: 0, dy: -1 },
   ArrowDown: { dx: 0, dy: 1 },
   ArrowLeft: { dx: -1, dy: 0 },
   ArrowRight: { dx: 1, dy: 0 },
@@ -15,4 +15,6 @@ export const keyMap = {
 
 export type ArrowKey = keyof typeof keyMap
 export type GameState = "notPlaying" | "playing" | "won"
-export type FinalScore = {time: number, steps: number}
+export type FinalScore = { time: number, steps: number }
+
+export type UserLevel = { user_level_id: string, user_name: string, layout: number[][] }

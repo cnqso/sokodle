@@ -1,9 +1,10 @@
-'use client'
+"use client";
 
 import { useState, useEffect } from "react";
 import Sokoban from "@/components/Sokoban";
 import { FinalScore, GameState } from "@/lib/types";
 import { Button } from "@/components/ui/button";
+import Loader from "@/components/Loader";
 
 export default function LevelEditor() {
   const [width, setWidth] = useState(7);
@@ -19,11 +20,14 @@ export default function LevelEditor() {
   const [testing, setTesting] = useState(false);
   const [playing, setPlaying] = useState<GameState>("notPlaying");
   const [finalScore, setFinalScore] = useState<FinalScore | null>(null);
-
+  const [submissionStatus, setSubmissionStatus] = useState<
+    "notSubmitting" | "submitting" | "submitted"
+  >("notSubmitting");
   // Store JSON version of map data for direct editing.
   const [mapDataString, setMapDataString] = useState(() =>
     JSON.stringify(mapData)
   );
+  const [copied, setCopied] = useState<boolean>(false);
 
   // Store any verification errors here.
   const [verificationErrors, setVerificationErrors] = useState<string[]>([]);
@@ -142,6 +146,26 @@ export default function LevelEditor() {
     }
   }
 
+  async function handleSubmit() {
+    if (submissionStatus !== "notSubmitting") return;
+    setSubmissionStatus("submitting");
+    await fetch("/api/submit-level", {
+      method: "POST",
+      body: JSON.stringify({ user_name: "testing", layout: mapData }),
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success === true) {
+          setSubmissionStatus("submitted");
+          setVerificationErrors([]);
+        } else {
+          setSubmissionStatus("notSubmitting");
+          setVerificationErrors(["Failed to submit level :("]);
+        }
+      });
+  }
+
   // Called when the user clicks "Verify Level"
   function handleVerify() {
     const result = verifyMapData();
@@ -166,28 +190,7 @@ export default function LevelEditor() {
 
   return (
     <div>
-      <div>
-        <label>
-          Width:
-          <input
-            type="number"
-            min="3"
-            value={width}
-            onChange={(e) => handleSizeChange(Number(e.target.value), height)}
-          />
-        </label>
-        <label>
-          Height:
-          <input
-            type="number"
-            min="3"
-            value={height}
-            onChange={(e) => handleSizeChange(width, Number(e.target.value))}
-          />
-        </label>
-      </div>
-
-      <div style={{ marginTop: "1rem" }}>
+      <div className="hidden">
         <label>Map Data (JSON):</label>
         <textarea
           style={{ display: "block", width: "100%", height: "200px" }}
@@ -201,6 +204,32 @@ export default function LevelEditor() {
           <div style={{ marginBottom: "1rem" }}>
             <Button onClick={handleVerify}>Verify Level</Button>{" "}
             <Button onClick={handleTestLevel}>Test Level</Button>
+          </div>
+          <div>
+            <label>
+              Width:
+              <input
+                className="w-12"
+                type="number"
+                min="3"
+                value={width}
+                onChange={(e) =>
+                  handleSizeChange(Number(e.target.value), height)
+                }
+              />
+            </label>
+            <label>
+              Height:
+              <input
+                className="w-12"
+                type="number"
+                min="3"
+                value={height}
+                onChange={(e) =>
+                  handleSizeChange(width, Number(e.target.value))
+                }
+              />
+            </label>
           </div>
           {verificationErrors.length > 0 && (
             <div style={{ color: "red", marginBottom: "1rem" }}>
@@ -245,7 +274,7 @@ export default function LevelEditor() {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      fontSize: 40,
+                      fontSize: 44,
                       cursor: "pointer",
                       backgroundColor: "#f0f0f0",
                       userSelect: "none",
@@ -262,9 +291,18 @@ export default function LevelEditor() {
 
       {testing && (
         <div>
-          <Button onClick={() => setTesting(false)}>Back to Editor</Button>
+          <Button
+            onClick={() => {
+              setTesting(false);
+              setPlaying("notPlaying");
+              setSubmissionStatus("notSubmitting");
+              setFinalScore(null);
+            }}
+          >
+            Back to Editor
+          </Button>
           {playing === "won" && (
-            <div style={{ marginTop: "1rem" }}>
+            <div className="mt-5 mb-2">
               <div style={{ color: "green", fontSize: 24, marginBottom: 10 }}>
                 🎉 You Win! 🎉
               </div>
@@ -272,21 +310,38 @@ export default function LevelEditor() {
                 Time: {finalScore?.time} Moves: {finalScore?.steps}
               </div>
               <Button
-                onClick={() =>
-                  navigator.clipboard.writeText(JSON.stringify(mapData))
-                }
+                className="mr-3"
+                onClick={() => {
+                  navigator.clipboard.writeText(JSON.stringify(mapData));
+                  setCopied(true);
+                }}
               >
-                Copy map
+                {copied ? "Copied!" : "Copy Map"}
               </Button>
+              {submissionStatus === "notSubmitting" && (
+                <Button onClick={() => handleSubmit()}>Submit map</Button>
+              )}
+              {submissionStatus === "submitting" && (
+                <Button>
+                  <Loader size={"1em"} width={"80px"} height={"0px"} />
+                </Button>
+              )}
+              {submissionStatus === "submitted" && (
+                <Button disabled variant="neutral">
+                  Submitted!
+                </Button>
+              )}
             </div>
           )}
 
-          <Sokoban
-            mapData={mapData}
-            playing={playing}
-            setPlaying={setPlaying}
-            setFinalScore={setFinalScore}
-          />
+          <div>
+            <Sokoban
+              mapData={mapData}
+              playing={playing}
+              setPlaying={setPlaying}
+              setFinalScore={setFinalScore}
+            />
+          </div>
         </div>
       )}
     </div>

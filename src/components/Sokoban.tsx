@@ -237,7 +237,7 @@ export default function Sokoban({
         style={{
           display: "grid",
           gridTemplateColumns: `repeat(${cols}, 50px)`,
-          gap: "2px",
+          gap: "0px",
           padding: "2px",
         }}
       >
@@ -270,9 +270,9 @@ export default function Sokoban({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: 30,
+                  fontSize: 40,
                   cursor: "pointer",
-                  backgroundColor: "#f0f0f0",
+                  backgroundColor: emoji !== "⬛" ? "#f0f0f0" : "000000",
                   userSelect: "none",
                 }}
               >
