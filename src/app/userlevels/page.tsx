@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
+import Link from 'next/link';
+import { useRouter } from "next/router";
 import { UserLevel } from "@/lib/types";
 
 
@@ -10,6 +11,8 @@ export default function UserLevelsPage() {
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+
+  const [currentLevel, setCurrentLevel] = useState<UserLevel | null>(null);
 
   // Fetch levels from the API with the current offset
   const fetchLevels = async () => {
@@ -44,54 +47,56 @@ export default function UserLevelsPage() {
   }, []);
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>User Levels</h1>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: "20px",
-        }}
-      >
-        {levels.map((level) => (
-          <LevelPreview userLevel={level} />
-        ))}
-      </div>
-      <div style={{ textAlign: "center", marginTop: "20px" }}>
-        {hasMore ? (
-          <button onClick={fetchLevels} disabled={loading}>
-            {loading ? "Loading..." : "Load More"}
-          </button>
-        ) : (
-          <p>No more levels to load.</p>
-        )}
-      </div>
+    <div>
+      {currentLevel ?
+
+        <div>Wow! This level is awesome</div>
+
+
+
+        :
+        <div>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            }}
+          >
+            {levels.map((level) => (
+              <LevelPreview setCurrentLevel={setCurrentLevel} userLevel={level} size={200} />
+            ))}
+          </div>
+          <div style={{ textAlign: "center", marginTop: "20px" }}>
+            {hasMore ? (
+              <button onClick={fetchLevels} disabled={loading}>
+                {loading ? "Loading..." : "Load More"}
+              </button>
+            ) : (
+              <p>No more levels to load.</p>
+            )}
+          </div>
+        </div>}
     </div>
   );
 }
 
-function LevelPreview({ userLevel }: { userLevel: UserLevel }) {
-  const maxWidth = 300;
-  const maxHeight = 300;
+function LevelPreview({ setCurrentLevel, userLevel, size }: { setCurrentLevel: React.Dispatch<React.SetStateAction<UserLevel | null>>, userLevel: UserLevel, size: number }) {
 
   const rows = userLevel.layout.length;
   const columns = userLevel.layout[0].length;
 
-  const squareSize = Math.floor(Math.min((maxWidth / columns), (maxHeight / rows)));
+  const squareSize = Math.floor(Math.min((size / columns), (size / rows)));
 
 
   const mapData = userLevel.layout;
   return (
-    <div key={userLevel.user_level_id}
-      className="border-1 borderRadius-4 p-10">
+    <Link key={userLevel.user_level_id} className="content-center item-center" href={`/userlevels/${userLevel.user_level_id}`}>
       <h2>{userLevel.user_name}</h2>
       <div
         className="grid"
         style={{
           display: "grid",
           gridTemplateColumns: `repeat(${mapData[0].length}, ${squareSize}px)`,
-          gap: "2px",
-          padding: "2px",
         }}
       >
         {mapData.map((thisRow, y) => {
@@ -133,7 +138,7 @@ function LevelPreview({ userLevel }: { userLevel: UserLevel }) {
 
 
 
-    </div>
+    </Link>
   );
 
 }
