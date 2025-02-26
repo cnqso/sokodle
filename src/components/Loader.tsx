@@ -12,6 +12,8 @@ interface LoaderProps {
 // List of emojis to randomly choose from
 const emojiList = ['🍒', '📦', '🧍', '✨', '🕺'];
 
+const secondaryEmojIList = ['A', 'B', 'C', 'D', 'E'];
+
 const Loader: React.FC<LoaderProps> = ({ width, height, size }) => {
   // Pick a random emoji once per mount.
   const randomEmoji = useMemo(
@@ -21,21 +23,21 @@ const Loader: React.FC<LoaderProps> = ({ width, height, size }) => {
 
   return (
     <div className="flex justify-center items-center">
-        <div
-          style={{ width, height }}
-          className="flex justify-center items-center"
+      <div
+        style={{ width, height }}
+        className="flex justify-center items-center"
+      >
+        <span
+          style={{
+            fontSize: size,
+            // The animation applies our custom spin keyframes defined in CSS.
+            animation: 'spin3d 1s linear infinite',
+            display: 'inline-block', // Ensures the element is animatable.
+          }}
         >
-          <span
-            style={{
-              fontSize: size,
-              // The animation applies our custom spin keyframes defined in CSS.
-              animation: 'spin3d 1s linear infinite',
-              display: 'inline-block', // Ensures the element is animatable.
-            }}
-          >
-            {randomEmoji}
-          </span>
-        </div>
+          {randomEmoji}
+        </span>
+      </div>
     </div>
   );
 };

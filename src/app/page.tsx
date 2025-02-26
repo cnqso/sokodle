@@ -49,7 +49,7 @@ export default function Home() {
   async function handleSubmit() {
     await fetch("/api/attempt", {
       method: "POST",
-      body: JSON.stringify({ levelID, moves: finalScore?.steps, timeMs: finalScore?.time}),
+      body: JSON.stringify({ levelID, moves: finalScore?.steps, timeMs: finalScore?.time }),
       headers: { "Content-Type": "application/json" },
     });
   }
@@ -59,8 +59,8 @@ export default function Home() {
     if (finalScore?.steps && finalScore?.time && levelID) {
       const response = handleSubmit();
       console.log(response)
-    }  
-  },[finalScore])
+    }
+  }, [finalScore])
 
   useEffect(() => {
     async function fetchRecentLevels() {
@@ -84,32 +84,29 @@ export default function Home() {
   }, []);
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen justify-center items-center align-items" style={{ padding: 20 }}>
 
-      <div className="flex flex-col min-h-screen justify-center items-center align-items" style={{ padding: 20 }}>
-
-        <WelcomeModal />
-        <Nav />
-        {playing == "won" && (
-          <div>
-            <div style={{ color: "green", fontSize: 24, marginBottom: 10 }}>
-              🎉 You Win! 🎉
-            </div>
-            <div> Time: {finalScore?.time} Moves: {finalScore?.steps}</div>
+      <WelcomeModal />
+      <Nav />
+      {playing == "won" && (
+        <div>
+          <div style={{ color: "green", fontSize: 24, marginBottom: 10 }}>
+            🎉 You Win! 🎉
           </div>
-        )}
-        <Card className="max-w-max max-width: max-content">
-          <CardHeader>
-            <CardTitle>🍒 Sokodle 📦</CardTitle>
-            <CardDescription>Use arrow keys or tap squares to move | Z to undo</CardDescription>
-          </CardHeader>
-          <CardContent>
-            { level ?
+          <div> Time: {finalScore?.time} Moves: {finalScore?.steps}</div>
+        </div>
+      )}
+      <Card className="max-w-max max-width: max-content">
+        <CardHeader>
+          <CardTitle>🍒 Sokodle 📦</CardTitle>
+          <CardDescription>Use arrow keys or tap squares to move | Z to undo</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {level ?
             <Sokoban mapData={level} playing={playing} setPlaying={setPlaying} setFinalScore={setFinalScore} />
-            :<Loader width={"400px"} height={"400px"} size={"60px"}/>}
-          </CardContent>
-        </Card>
-      </div>
-    </>
+            : <Loader width={"400px"} height={"400px"} size={"60px"} />}
+        </CardContent>
+      </Card>
+    </div>
   );
 };
