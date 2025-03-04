@@ -1,30 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from 'next/link';
-import { useRouter } from "next/router";
 import { UserLevel } from "@/lib/types";
 import { useUserLevels } from "@/lib/UserLevelsContext";
 
 export default function UserLevelsPage() {
-  const [offset, setOffset] = useState(0);
-
-  const [currentLevel, setCurrentLevel] = useState<UserLevel | null>(null);
   const { levels, fetchLevels, loading, hasMore } = useUserLevels();
-  // Fetch levels from the API with the current offset
-
+  console.log(levels.length)
   return (
     <div>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-        }}
-      >
+
         {levels.map((level) => (
-          <LevelPreview setCurrentLevel={setCurrentLevel} userLevel={level} size={200} />
+          <LevelPreview userLevel={level} size={200} />
         ))}
-      </div>
       <div style={{ textAlign: "center", marginTop: "20px" }}>
         {hasMore ? (
           <button onClick={fetchLevels} disabled={loading}>
@@ -38,7 +26,7 @@ export default function UserLevelsPage() {
   );
 }
 
-function LevelPreview({ setCurrentLevel, userLevel, size }: { setCurrentLevel: React.Dispatch<React.SetStateAction<UserLevel | null>>, userLevel: UserLevel, size: number }) {
+function LevelPreview({ userLevel, size }: { userLevel: UserLevel, size: number }) {
 
   const rows = userLevel.layout.length;
   const columns = userLevel.layout[0].length;
@@ -48,12 +36,12 @@ function LevelPreview({ setCurrentLevel, userLevel, size }: { setCurrentLevel: R
 
   const mapData = userLevel.layout;
   return (
-    <Link key={userLevel.user_level_id} className="content-center item-center" href={`/userlevels/${userLevel.user_level_id}`}>
+    <Link key={userLevel.user_level_id} className="content-center item-center text-center m-10" href={`/userlevels/${userLevel.user_level_id}`}>
       <h2>{userLevel.user_name}</h2>
       <div
-        className="grid"
+        className="grid content-center item-center m-auto" 
         style={{
-          display: "grid",
+          width:`${squareSize*mapData[0].length}px`,
           gridTemplateColumns: `repeat(${mapData[0].length}, ${squareSize}px)`,
         }}
       >
@@ -92,10 +80,6 @@ function LevelPreview({ setCurrentLevel, userLevel, size }: { setCurrentLevel: R
           });
         })}
       </div>
-
-
-
-
     </Link>
   );
 

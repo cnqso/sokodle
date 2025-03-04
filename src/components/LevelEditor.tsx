@@ -5,6 +5,7 @@ import Sokoban from "@/components/Sokoban";
 import { FinalScore, GameState } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/Loader";
+import { formatMilliseconds } from "@/lib/utils";
 
 export default function LevelEditor() {
   const [width, setWidth] = useState(7);
@@ -201,11 +202,11 @@ export default function LevelEditor() {
 
       {!testing && (
         <div>
-          <div style={{ marginBottom: "1rem" }}>
-            <Button onClick={handleVerify}>Verify Level</Button>{" "}
+          <div className="flex items-center justify-center">
+            <Button className="m-2" onClick={handleVerify}>Verify Level</Button>{" "}
             <Button onClick={handleTestLevel}>Test Level</Button>
           </div>
-          <div>
+          <div className="flex items-center justify-center">
             <label>
               Width:
               <input
@@ -302,12 +303,12 @@ export default function LevelEditor() {
             Back to Editor
           </Button>
           {playing === "won" && (
-            <div className="mt-5 mb-2">
+            <div className="text-center">
               <div style={{ color: "green", fontSize: 24, marginBottom: 10 }}>
                 🎉 You Win! 🎉
               </div>
               <div>
-                Time: {finalScore?.time} Moves: {finalScore?.steps}
+                Time: {`${finalScore && formatMilliseconds(finalScore.time)}s —— `} Moves: {finalScore?.steps}
               </div>
               <Button
                 className="mr-3"

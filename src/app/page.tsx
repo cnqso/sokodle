@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useEffect, useState } from "react";
 import LevelEditor from "@/components/LevelEditor";
@@ -17,25 +17,24 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/Loader";
+import { formatMilliseconds } from "@/lib/utils";
 
 // Example usage
 export default function Home() {
-  const [playing, setPlaying] = useState<GameState>(
-    "notPlaying"
-  );
+  const [playing, setPlaying] = useState<GameState>("notPlaying");
 
-  const date = new Date().toISOString().split('T')[0];
+  const date = new Date().toISOString().split("T")[0];
   const [finalScore, setFinalScore] = useState<FinalScore | null>(null);
   const [level, setLevel] = useState<number[][] | null>(null);
   const [levelID, setLevelID] = useState<number | null>(null);
@@ -43,24 +42,30 @@ export default function Home() {
   useEffect(() => {
     fetch(`/api/daily-level?date=${date}`)
       .then((res) => res.json())
-      .then((data) => { setLevel(data.layout.rows); setLevelID(data.daily_id); })
+      .then((data) => {
+        setLevel(data.layout.rows);
+        setLevelID(data.daily_id);
+      });
   }, [date]);
 
   async function handleSubmit() {
     await fetch("/api/attempt", {
       method: "POST",
-      body: JSON.stringify({ levelID, moves: finalScore?.steps, timeMs: finalScore?.time }),
+      body: JSON.stringify({
+        levelID,
+        moves: finalScore?.steps,
+        timeMs: finalScore?.time,
+      }),
       headers: { "Content-Type": "application/json" },
     });
   }
 
-
   useEffect(() => {
     if (finalScore?.steps && finalScore?.time && levelID) {
       const response = handleSubmit();
-      console.log(response)
+      console.log(response);
     }
-  }, [finalScore])
+  }, [finalScore]);
 
   useEffect(() => {
     async function fetchRecentLevels() {
@@ -84,29 +89,38 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen justify-center items-center align-items" style={{ padding: 20 }}>
-
+    <div>
       <WelcomeModal />
-      <Nav />
       {playing == "won" && (
-        <div>
+        <div className="text-center">
           <div style={{ color: "green", fontSize: 24, marginBottom: 10 }}>
             🎉 You Win! 🎉
           </div>
-          <div> Time: {finalScore?.time} Moves: {finalScore?.steps}</div>
+          <div>
+            Time: {`${finalScore && formatMilliseconds(finalScore.time)}s —— `} Moves: {finalScore?.steps}
+          </div>
         </div>
       )}
       <Card className="max-w-max max-width: max-content">
         <CardHeader>
           <CardTitle>🍒 Sokodle 📦</CardTitle>
-          <CardDescription>Use arrow keys or tap squares to move | Z to undo</CardDescription>
+          <CardDescription>
+            Use arrow keys or tap squares to move | Z to undo
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          {level ?
-            <Sokoban mapData={level} playing={playing} setPlaying={setPlaying} setFinalScore={setFinalScore} />
-            : <Loader width={"400px"} height={"400px"} size={"60px"} />}
+          {level ? (
+            <Sokoban
+              mapData={level}
+              playing={playing}
+              setPlaying={setPlaying}
+              setFinalScore={setFinalScore}
+            />
+          ) : (
+            <Loader width={"400px"} height={"400px"} size={"60px"} />
+          )}
         </CardContent>
       </Card>
     </div>
   );
-};
+}
