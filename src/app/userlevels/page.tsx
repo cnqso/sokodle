@@ -3,6 +3,12 @@
 import Link from 'next/link';
 import { UserLevel } from "@/lib/types";
 import { useUserLevels } from "@/lib/UserLevelsContext";
+import localFont from 'next/font/local';
+
+const orelo = localFont({
+  src: '../../../public/fonts/Orelo-Extended-Trial-Regular-BF674e807573e67.otf', // Adjust this path based on where you place the font file
+  variable: '--font-orelo',
+})
 
 export default function UserLevelsPage() {
   const { levels, fetchLevels, loading, hasMore } = useUserLevels();
@@ -37,7 +43,7 @@ function LevelPreview({ userLevel, size }: { userLevel: UserLevel, size: number 
   const mapData = userLevel.layout;
   return (
     <Link key={userLevel.user_level_id} className="content-center item-center text-center m-10" href={`/userlevels/${userLevel.user_level_id}`}>
-      <h2>{userLevel.user_name}</h2>
+      <h2 className={`${orelo.className} text-2xl`}>{userLevel.user_name}</h2>
       <div
         className="grid content-center item-center m-auto" 
         style={{

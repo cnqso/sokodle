@@ -74,6 +74,9 @@ export default {
 				base: '400',
 				heading: '800',
 			},
+			fontFamily: {
+				orelo: ['var(--font-orelo)'],
+			},
 		}
 	},
 	plugins: [require("tailwindcss-animate")],

@@ -37,7 +37,7 @@ export default function Home() {
   const date = new Date().toISOString().split("T")[0];
   const [finalScore, setFinalScore] = useState<FinalScore | null>(null);
   const [level, setLevel] = useState<number[][] | null>(null);
-  const [levelID, setLevelID] = useState<number | null>(null);
+  const [levelID, setLevelID] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     fetch(`/api/daily-level?date=${date}`)
@@ -67,54 +67,27 @@ export default function Home() {
     }
   }, [finalScore]);
 
-  useEffect(() => {
-    async function fetchRecentLevels() {
-      try {
-        // Fetch from your route, e.g. offset=0, limit=10 for the first 10
-        const response = await fetch("/api/user-levels?offset=0&limit=10");
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-
-        const data = await response.json();
-
-        // Print the fetched data to the console
-        console.log("Recent Levels:", data);
-      } catch (error) {
-        console.error("Error fetching recent levels:", error);
-      }
-    }
-
-    fetchRecentLevels();
-  }, []);
-
   return (
     <div>
       <WelcomeModal />
-      {playing == "won" && (
-        <div className="text-center">
-          <div style={{ color: "green", fontSize: 24, marginBottom: 10 }}>
-            🎉 You Win! 🎉
-          </div>
-          <div>
-            Time: {`${finalScore && formatMilliseconds(finalScore.time)}s —— `} Moves: {finalScore?.steps}
-          </div>
-        </div>
-      )}
       <Card className="max-w-max max-width: max-content">
-        <CardHeader>
-          <CardTitle>🍒 Sokodle 📦</CardTitle>
+      {level && <CardHeader className="pb-0">
+         <CardTitle className="font-orelo text-2xl">
+            🍒 Sokodle {levelID ? `#${levelID}` : ''} 📦
+          </CardTitle>
           <CardDescription>
-            Use arrow keys or tap squares to move | Z to undo
+            Use arrow keys or tap squares to move
           </CardDescription>
-        </CardHeader>
-        <CardContent>
+        </CardHeader>}
+        <CardContent className="px-2">
           {level ? (
             <Sokoban
               mapData={level}
               playing={playing}
               setPlaying={setPlaying}
               setFinalScore={setFinalScore}
+              context="daily"
+              levelNumber={levelID}
             />
           ) : (
             <Loader width={"400px"} height={"400px"} size={"60px"} />

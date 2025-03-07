@@ -17,4 +17,5 @@ export type ArrowKey = keyof typeof keyMap
 export type GameState = "notPlaying" | "playing" | "won"
 export type FinalScore = { time: number, steps: number }
 
-export type UserLevel = { user_level_id: string, user_name: string, layout: number[][] }
+// Timestamp looks like this: "2025-02-09T22:00:32.000Z"
+export type UserLevel = { user_level_id: string, user_name: string, layout: number[][], ip_address: string, uploaded_at: string }

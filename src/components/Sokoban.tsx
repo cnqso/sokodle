@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { Coords, keyMap, Vector, ArrowKey, FinalScore, GameState } from "@/lib/types";
 import Timer from "@/components/Timer";
 import { Button } from "@/components/ui/button";
+import ShareModal from "@/components/ShareModal";
 
 function findPlayerStart(mapData: number[][]): Coords {
   for (let y = 0; y < mapData.length; y++) {
@@ -16,12 +17,14 @@ function findPlayerStart(mapData: number[][]): Coords {
 }
 
 export default function Sokoban({
-  mapData, playing, setPlaying, setFinalScore
+  mapData, playing, setPlaying, setFinalScore, context = 'user', levelNumber
 }: {
   mapData: number[][];
   playing: GameState;
   setPlaying: React.Dispatch<React.SetStateAction<GameState>>;
   setFinalScore: React.Dispatch<React.SetStateAction<FinalScore | null>>;
+  context?: 'daily' | 'user';
+  levelNumber?: number;
 }) {
   const initialBoxes: Coords[] = [];
   mapData.forEach((row, y) => {
@@ -39,6 +42,8 @@ export default function Sokoban({
   ]);
   const [currentStep, setCurrentStep] = useState(0);
 
+  // Add this new state near the other useState declarations
+  const [showShareModal, setShowShareModal] = useState(false);
 
   // Static elements
   const [walls] = useState(() => {
@@ -84,6 +89,8 @@ export default function Sokoban({
     setPlayerPosition(prevState.player);
     setBoxes(prevState.boxes);
     setCurrentStep(prevStep);
+    // Update history to remove the undone moves
+    setHistory(prev => prev.slice(0, prevStep + 1));
   };
 
   function handleMove(direction: Vector) {
@@ -166,7 +173,7 @@ export default function Sokoban({
       };
     }
   
-    // 6. Move the player into the first box’s old spot.
+    // 6. Move the player into the first box's old spot.
     const newPlayer = { x: newX, y: newY };
   
     // 7. Update state (player, boxes, history).
@@ -228,17 +235,49 @@ export default function Sokoban({
   const rows = mapData.length;
   const cols = mapData[0]?.length || 0;
 
-  return (
-    <div>
+  // Add new state for cell size
+  const [cellSize, setCellSize] = useState(50);
+  
+  // Add resize handler
+  useEffect(() => {
+    const updateCellSize = () => {
+      const containerPadding = 30; // Reduced padding for narrow screens
+      const availableWidth = window.innerWidth - containerPadding;
+      const availableHeight = window.innerHeight - 250; // Increased space for other elements
+      
+      const cols = mapData[0]?.length || 0;
+      const rows = mapData.length;
+      
+      // Calculate cell size based on available space and aspect ratio
+      const cellByWidth = availableWidth / cols;
+      const cellByHeight = availableHeight / rows;
+      
+      // Use the smaller of the two sizes to ensure it fits both dimensions
+      const newSize = Math.min(cellByWidth, cellByHeight);
+      
+      // Cap the size between 16px and 50px
+      setCellSize(Math.min(50, Math.max(16, newSize)));
+    };
 
+    // Initial calculation
+    updateCellSize();
+
+    // Update on resize
+    window.addEventListener('resize', updateCellSize);
+    return () => window.removeEventListener('resize', updateCellSize);
+  }, [mapData]);
+
+  return (
+    <div className="flex flex-col items-center">
       <Timer playing={playing} moves={history.length} setFinalScore={setFinalScore}/>
       <div
-        className="grid"
+        className="grid overflow-hidden font-sans"
         style={{
           display: "grid",
-          gridTemplateColumns: `repeat(${cols}, 50px)`,
+          gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`,
           gap: "0px",
           padding: "2px",
+          maxWidth: '100vw',
         }}
       >
         {Array.from({ length: rows }).map((_, y) =>
@@ -264,13 +303,14 @@ export default function Sokoban({
               <div
                 key={`${x}-${y}`}
                 onClick={() => handleCellClick(x, y)}
+                className="font-sans"
                 style={{
-                  width: 50,
-                  height: 50,
+                  width: cellSize,
+                  height: cellSize,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: 40,
+                  fontSize: `${cellSize * 0.8}px`,
                   cursor: "pointer",
                   backgroundColor: emoji !== "⬛" ? "#f0f0f0" : "000000",
                   userSelect: "none",
@@ -282,9 +322,24 @@ export default function Sokoban({
           })
         )}
       </div>
-      <Button onClick={handleUndo} style={{ marginBottom: 10 }}>
-        Undo (Z)
-      </Button>
+      {playing === "won" ? (
+        context === 'daily' ? (
+          <Button onClick={() => setShowShareModal(true)} className="mt-4 ml-1 mr-auto">
+            Share
+          </Button>
+        ) : null
+      ) : (
+        <Button onClick={handleUndo} className="mt-4 ml-1 mr-auto">
+          Undo (Z)
+        </Button>
+      )}
+      {showShareModal && playing === "won" && context === 'daily' && (
+        <ShareModal
+          finalScore={{ time: history.length - 1, steps: history.length - 1 }}
+          onClose={() => setShowShareModal(false)}
+          levelNumber={levelNumber}
+        />
+      )}
     </div>
   );
 }

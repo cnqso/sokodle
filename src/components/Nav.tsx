@@ -1,53 +1,50 @@
 'use client'
 
 import * as React from 'react'
+import Link from 'next/link'
 
 import {
   NavigationMenu,
-  NavigationMenuContent,
+  NavigationMenuList,
   NavigationMenuItem,
   NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu'
 
 import { cn } from '@/lib/utils'
-import { Link } from '@radix-ui/react-navigation-menu'
-
-
 
 export default function Nav() {
   return (
-    <NavigationMenu className="z-[5] m750:max-w-[300px] grow-0 mb-5">
+    <NavigationMenu className="z-[5] m750:max-w-[300px] grow-0 mb-2 mt-2">
       <NavigationMenuList className="m750:max-w-[300px]">
         <NavigationMenuItem>
-          <Link href="/">
-            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+          <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+            <Link href="/">
               <span className="m750:max-w-[80px] m750:text-xs">
                 Home
               </span>
-            </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <Link href="/editor">
-            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              <span className="m750:max-w-[80px] m750:text-xs">
-                Level Creator
-              </span>
-            </NavigationMenuLink>
-          </Link>
+            </Link>
+          </NavigationMenuLink>
         </NavigationMenuItem>
 
         <NavigationMenuItem>
-          <Link href="/userlevels">
-            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+          <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+            <Link href="/editor">
+              <span className="m750:max-w-[80px] m750:text-xs">
+                Level Creator
+              </span>
+            </Link>
+          </NavigationMenuLink>
+        </NavigationMenuItem>
+
+        <NavigationMenuItem>
+          <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+            <Link href="/userlevels">
               <span className="m750:max-w-[80px] m750:text-xs">
                 User levels
               </span>
-            </NavigationMenuLink>
-          </Link>
+            </Link>
+          </NavigationMenuLink>
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>

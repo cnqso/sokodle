@@ -13,6 +13,13 @@ import { FinalScore, GameState, UserLevel } from "@/lib/types";
 import { formatMilliseconds } from "@/lib/utils";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import localFont from 'next/font/local';
+import { X } from "lucide-react";
+
+const orelo = localFont({
+  src: '../../../../public/fonts/Orelo-Extended-Trial-Regular-BF674e807573e67.otf', // Adjust this path based on where you place the font file
+  variable: '--font-orelo',
+})
 
 export default function Level({
   params,
@@ -67,32 +74,26 @@ export default function Level({
 
   return (
     <div>
-      {playing == "won" && (
-        <div className="text-center">
-          <div style={{ color: "green", fontSize: 24, marginBottom: 10 }}>
-            🎉 You Win! 🎉
-          </div>
-          <div>
-            Time: {`${finalScore && formatMilliseconds(finalScore.time)}s —— `} Moves: {finalScore?.steps}
-          </div>
-        </div>
-      )}
-      <Card className="max-w-max max-width: max-content">
-        <Link href="/userlevels" className=" float-right m-2">
-          Back
+      <Card className="max-w-max max-width: max-content relative">
+        <Link 
+          href="/userlevels" 
+          className="absolute top-2 right-2 text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <X size={24} />
         </Link>
 
-        <CardHeader>
-          <CardTitle>{level?.user_name}</CardTitle>
+        <CardHeader className="pb-0">
+          <CardTitle className={orelo.className}>{level?.user_name}</CardTitle>
           <CardDescription>Made in {countryName}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-2">
           {level ? (
             <Sokoban
               mapData={level.layout}
               playing={playing}
               setPlaying={setPlaying}
               setFinalScore={setFinalScore}
+              context="user"
             />
           ) : (
             <Loader width={"400px"} height={"400px"} size={"60px"} />
