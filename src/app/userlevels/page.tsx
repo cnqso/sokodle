@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { UserLevel } from "@/lib/types";
-import { useUserLevels } from "@/lib/UserLevelsContext";
+import { useUserLevels } from "@/app/userlevels/UserLevelsContext";
 import localFont from 'next/font/local';
 
 const orelo = localFont({
@@ -12,16 +12,21 @@ const orelo = localFont({
 
 export default function UserLevelsPage() {
   const { levels, fetchLevels, loading, hasMore } = useUserLevels();
-  console.log(levels.length)
+
   return (
     <div>
-
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {levels.map((level) => (
-          <LevelPreview userLevel={level} size={200} />
+          <LevelPreview key={level.user_level_id} userLevel={level} size={200} />
         ))}
+      </div>
       <div style={{ textAlign: "center", marginTop: "20px" }}>
         {hasMore ? (
-          <button onClick={fetchLevels} disabled={loading}>
+          <button 
+            onClick={fetchLevels} 
+            disabled={loading}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50"
+          >
             {loading ? "Loading..." : "Load More"}
           </button>
         ) : (
@@ -42,8 +47,8 @@ function LevelPreview({ userLevel, size }: { userLevel: UserLevel, size: number 
 
   const mapData = userLevel.layout;
   return (
-    <Link key={userLevel.user_level_id} className="content-center item-center text-center m-10" href={`/userlevels/${userLevel.user_level_id}`}>
-      <h2 className={`${orelo.className} text-2xl`}>{userLevel.user_name}</h2>
+    <Link className="content-center item-center text-center m-10" href={`/userlevels/${userLevel.user_level_id}`}>
+      <h2 className={`${orelo.className} text-2xl`}>{userLevel.user_name}{" "}{userLevel.user_level_id}</h2>
       <div
         className="grid content-center item-center m-auto" 
         style={{

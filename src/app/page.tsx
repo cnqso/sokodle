@@ -76,7 +76,7 @@ export default function Home() {
             🍒 Sokodle {levelID ? `#${levelID}` : ''} 📦
           </CardTitle>
           <CardDescription>
-            Use arrow keys or tap squares to move 0 i
+            Use arrow keys or tap squares to move
           </CardDescription>
         </CardHeader>}
         <CardContent className="px-2">

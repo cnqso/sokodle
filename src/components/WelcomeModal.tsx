@@ -39,7 +39,7 @@ export default function WelcomeModal() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Welcome to Sokodle!</DialogTitle>
+            <DialogTitle className={'font-orelo'}>Welcome to Sokodle!</DialogTitle>
             <DialogDescription>
               Sokoban (Japanese for &ldquo;warehouse keeper&rdquo;) is a puzzle
               game where you must push boxes to their goal without getting stuck.

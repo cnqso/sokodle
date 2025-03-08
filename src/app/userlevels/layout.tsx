@@ -1,6 +1,6 @@
 "use client";
 
-import { UserLevelsProvider } from "@/lib/UserLevelsContext";
+import { UserLevelsProvider } from "@/app/userlevels/UserLevelsContext";
 
 export default function UserLevelsPage({
   children,
