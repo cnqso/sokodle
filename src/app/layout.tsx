@@ -1,17 +1,11 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
 import { JetBrains_Mono } from "next/font/google";
 import localFont from 'next/font/local';
 import "./globals.css";
 import Nav from "@/components/Nav";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
 const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-mono",
+  variable: "--font-jetbrains",
   subsets: ["latin"],
 });
 
@@ -33,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${jetbrainsMono.variable} ${orelo.variable} font-mono antialiased`}
+        className={`${jetbrainsMono.variable} ${orelo.variable} font-jetbrains antialiased`}
       >
         <div className="flex flex-col min-h-screen items-center">
           <Nav />

@@ -312,7 +312,6 @@ export default function Sokoban({
                   justifyContent: "center",
                   fontSize: `${cellSize * 0.8}px`,
                   cursor: "pointer",
-                  backgroundColor: emoji !== "⬛" ? "#f0f0f0" : "000000",
                   userSelect: "none",
                 }}
               >

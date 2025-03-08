@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import LevelEditor from "@/components/LevelEditor";
+import LevelEditor from "@/app/editor/LevelEditor";
 
 import Sokoban from "@/components/Sokoban";
 import { FinalScore, GameState } from "@/lib/types";
@@ -76,7 +76,7 @@ export default function Home() {
             🍒 Sokodle {levelID ? `#${levelID}` : ''} 📦
           </CardTitle>
           <CardDescription>
-            Use arrow keys or tap squares to move
+            Use arrow keys or tap squares to move 0 i
           </CardDescription>
         </CardHeader>}
         <CardContent className="px-2">

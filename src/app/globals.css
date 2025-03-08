@@ -24,8 +24,7 @@
   --heading-font-weight: 700;
 
   --shadow: var(--box-shadow-x) var(--box-shadow-y) 0px 0px var(--border);
-
-  --font-sans: 'Geist', sans-serif;
+  --font-jetbrains: 'JetBrains Mono', monospace;
   --font-mono: 'JetBrains Mono', monospace;
   --font-orelo: 'Orelo-SemiWide', system-ui;
 }
@@ -57,10 +56,6 @@
 
 @layer base {
   body {
-    font-family: var(--font-mono);
-  }
-  
-  .font-sans {
-    font-family: var(--font-sans);
+    font-family: var(--font-jetbrains);
   }
 }
