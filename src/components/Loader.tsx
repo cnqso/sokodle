@@ -12,7 +12,6 @@ interface LoaderProps {
 // List of emojis to randomly choose from
 const emojiList = ['🍒', '📦', '🧍', '✨', '🕺'];
 
-const secondaryEmojIList = ['A', 'B', 'C', 'D', 'E'];
 
 const Loader: React.FC<LoaderProps> = ({ width, height, size }) => {
   // Pick a random emoji once per mount.

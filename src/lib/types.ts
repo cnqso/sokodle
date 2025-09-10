@@ -19,3 +19,4 @@ export type FinalScore = { time: number, steps: number }
 
 // Timestamp looks like this: "2025-02-09T22:00:32.000Z"
 export type UserLevel = { user_level_id: string, user_name: string, layout: number[][], ip_address: string, uploaded_at: string }
+export type UserLevelRow = { user_level_id: string, user_name: string, layout: string, ip_address: string, uploaded_at: string }

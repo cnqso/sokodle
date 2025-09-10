@@ -3,8 +3,9 @@
 
 import { getDBConnection } from "@/lib/db";
 import { headers } from "next/headers";
+import { NextRequest } from "next/server";
 
-export async function POST(request: any) {
+export async function POST(request: NextRequest) {
 
   // Optional: If you want to ensure the request is a POST (in routes, you'd typically name the function POST anyway).
   if (request.method && request.method !== "POST") {
@@ -20,7 +21,7 @@ export async function POST(request: any) {
     levelID = Number(body.levelID);
     moves = Number(body.moves);
     timeMs = Number(body.timeMs);
-  } catch (error) {
+  } catch {
     return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
       status: 400,
       headers: { "Content-Type": "application/json" },

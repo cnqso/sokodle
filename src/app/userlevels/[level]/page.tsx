@@ -10,9 +10,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { FinalScore, GameState, UserLevel } from "@/lib/types";
-import { formatMilliseconds } from "@/lib/utils";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import localFont from 'next/font/local';
 import { X } from "lucide-react";
 
@@ -26,13 +25,13 @@ export default function Level({
 }: {
   params: Promise<{ level: string }>;
 }) {
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [level, setLevel] = useState<UserLevel | null>(null);
   const [playing, setPlaying] = useState<GameState>("notPlaying");
   const [finalScore, setFinalScore] = useState<FinalScore | null>(null);
 
-  const fetchLevel = async () => {
-    setLoading(true);
+  const fetchLevel = useCallback(async () => {
+    // setLoading(true);
     try {
       const levelId = await params;
       const response = await fetch(`/api/user-level?id=${levelId.level}`);
@@ -45,10 +44,11 @@ export default function Level({
     } catch (error) {
       console.error("Error fetching levels:", error);
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
-  };
-  async function handleSubmit() {
+  }, [params]);
+
+  const handleSubmit = useCallback(async () => {
     await fetch("/api/user-level-attempt", {
       method: "POST",
       body: JSON.stringify({
@@ -58,19 +58,19 @@ export default function Level({
       }),
       headers: { "Content-Type": "application/json" },
     });
-  }
+  }, [level?.user_level_id, finalScore?.steps, finalScore?.time]);
 
   const countryName = "the USA 🇺🇸";
 
   useEffect(() => {
     fetchLevel();
-  }, []);
+  }, [fetchLevel]);
   // Initial fetch on component mount
   useEffect(() => {
     if (finalScore?.steps && finalScore?.time && level?.user_level_id) {
       handleSubmit();
     }
-  }, [finalScore]);
+  }, [finalScore, handleSubmit, level?.user_level_id]);
 
   return (
     <div>

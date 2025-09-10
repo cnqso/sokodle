@@ -5,7 +5,6 @@ import Sokoban from "@/components/Sokoban";
 import { FinalScore, GameState } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/Loader";
-import { formatMilliseconds } from "@/lib/utils";
 import {
   Card,
   CardContent,
@@ -42,6 +41,7 @@ export default function LevelEditor() {
     "notSubmitting" | "submitting" | "submitted"
   >("notSubmitting");
   // Store JSON version of map data for direct editing.
+  console.log(finalScore)
   const [mapDataString, setMapDataString] = useState(() =>
     JSON.stringify(mapData)
   );
@@ -166,7 +166,7 @@ export default function LevelEditor() {
         }
       }
     } catch (error) {
-      // Invalid JSON, do nothing or show error as needed.
+      console.error("Error parsing map data:", error);
     }
   }
 

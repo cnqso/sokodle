@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Coords, keyMap, Vector, ArrowKey, FinalScore, GameState } from "@/lib/types";
 import Timer from "@/components/Timer";
 import { Button } from "@/components/ui/button";
@@ -78,10 +78,10 @@ export default function Sokoban({
     if (allGoalsCovered) {
       setPlaying("won");
     }
-  }, [boxes, goals]);
+  }, [boxes, goals, setPlaying]);
 
   // Undo functionality
-  function handleUndo() {
+  const handleUndo = useCallback(() => {
     if (playing !== "playing") return;
     if (currentStep === 0) return;
     const prevStep = currentStep - 1;
@@ -91,9 +91,24 @@ export default function Sokoban({
     setCurrentStep(prevStep);
     // Update history to remove the undone moves
     setHistory(prev => prev.slice(0, prevStep + 1));
-  };
+  }, [playing, currentStep, history]);
 
-  function handleMove(direction: Vector) {
+  /**
+   * Helper to move the player if no boxes are involved in the move.
+   */
+  const movePlayerWithoutBoxes = useCallback((newX: number, newY: number) => {
+    const newPlayer = { x: newX, y: newY };
+  
+    setHistory((prev) => {
+      const newHistory = prev.slice(0, currentStepRef.current + 1);
+      newHistory.push({ player: newPlayer, boxes: boxes });
+      return newHistory;
+    });
+    setCurrentStep((prev) => prev + 1);
+    setPlayerPosition(newPlayer);
+  }, [boxes]);
+
+  const handleMove = useCallback((direction: Vector) => {
     if (playing === "won") return;
     if (playing === "notPlaying") {
       setPlaying("playing");
@@ -185,22 +200,7 @@ export default function Sokoban({
     setCurrentStep((prev) => prev + 1);
     setPlayerPosition(newPlayer);
     setBoxes(newBoxes);
-  }
-  
-  /**
-   * Helper to move the player if no boxes are involved in the move.
-   */
-  function movePlayerWithoutBoxes(newX: number, newY: number) {
-    const newPlayer = { x: newX, y: newY };
-  
-    setHistory((prev) => {
-      const newHistory = prev.slice(0, currentStepRef.current + 1);
-      newHistory.push({ player: newPlayer, boxes: boxes });
-      return newHistory;
-    });
-    setCurrentStep((prev) => prev + 1);
-    setPlayerPosition(newPlayer);
-  }
+  }, [playing, playerPosition, walls, boxes, setPlaying, movePlayerWithoutBoxes]);
 
   // Keyboard controls
   useEffect(() => {
@@ -218,7 +218,7 @@ export default function Sokoban({
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [handleMove, handleUndo]);
+  }, [handleMove, handleUndo, validKeys]);
 
   // Touch controls
   const handleCellClick = (x: number, y: number) => {

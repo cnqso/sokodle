@@ -7,7 +7,7 @@ export function setLocalStorage<T>(key: string, value: T): void {
     try {
       const raw = localStorage.getItem(key)
       return raw ? (JSON.parse(raw) as T) : defaultValue
-    } catch (err) {
+    } catch {
       // In case JSON parse fails, return the default
       return defaultValue
     }

@@ -20,7 +20,7 @@ export async function POST(request) {
     levelID = Number(body.levelID);
     moves = Number(body.moves);
     timeMs = Number(body.timeMs);
-  } catch (error) {
+  } catch {
     return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
       status: 400,
       headers: { "Content-Type": "application/json" },

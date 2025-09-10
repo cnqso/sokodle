@@ -1,34 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import LevelEditor from "@/app/editor/LevelEditor";
+import { useEffect, useState, useCallback } from "react";
 
 import Sokoban from "@/components/Sokoban";
 import { FinalScore, GameState } from "@/lib/types";
 import WelcomeModal from "@/components/WelcomeModal";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import Nav from "@/components/Nav";
 
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import Loader from "@/components/Loader";
-import { formatMilliseconds } from "@/lib/utils";
 
 // Example usage
 export default function Home() {
@@ -54,7 +39,7 @@ export default function Home() {
       });
   }, [date]);
 
-  async function handleSubmit() {
+  const handleSubmit = useCallback(async () => {
     await fetch("/api/attempt", {
       method: "POST",
       body: JSON.stringify({
@@ -64,14 +49,14 @@ export default function Home() {
       }),
       headers: { "Content-Type": "application/json" },
     });
-  }
+  }, [levelID, finalScore?.steps, finalScore?.time]);
 
   useEffect(() => {
     if (finalScore?.steps && finalScore?.time && levelID) {
       const response = handleSubmit();
       console.log(response);
     }
-  }, [finalScore]);
+  }, [finalScore, handleSubmit, levelID]);
 
   return (
     <div>

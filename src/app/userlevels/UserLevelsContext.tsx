@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import { UserLevel } from "@/lib/types";
 
 interface UserLevelsContextType {
@@ -33,7 +33,7 @@ export const UserLevelsProvider = ({ children }: { children: ReactNode }) => {
     setLoading(false);
   };
 
-  const fetchLevels = async () => {
+  const fetchLevels = useCallback(async () => {
     if (loading || !mounted) return;
     setLoading(true);
 
@@ -63,16 +63,14 @@ export const UserLevelsProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [loading, mounted, offset]);
 
   // Handle initial mount
   useEffect(() => {
-    let isMounted = true;
     setMounted(true);
     resetLevels();
 
     return () => {
-      isMounted = false;
       setMounted(false);
       resetLevels();
     };
@@ -83,7 +81,7 @@ export const UserLevelsProvider = ({ children }: { children: ReactNode }) => {
     if (mounted && levels.length === 0) {
       fetchLevels();
     }
-  }, [mounted]);
+  }, [mounted, fetchLevels, levels.length]);
 
   return (
     <UserLevelsContext.Provider value={{ levels, fetchLevels, loading, hasMore, resetLevels }}>

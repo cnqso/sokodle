@@ -24,7 +24,7 @@ export default function StopWatch({
         setFinalScore({ time: totalMs, steps: moves });
       }
     }
-  }, [playing]);
+  }, [playing, setFinalScore, moves, totalMs]);
 
   const format = (num: number) => (num < 10 ? `0${num}` : num);
   

@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDBConnection } from "@/lib/db";
-import { UserLevel } from "@/lib/types";
+import { UserLevelRow } from "@/lib/types";
+
 
 export async function GET(request: NextRequest) {
   try {
     // Parse query params from URL
     const { searchParams } = new URL(request.url);
     const idParam = searchParams.get("id") || "0";
-    const limitParam = searchParams.get("limit") || "10";
+    // const limitParam = searchParams.get("limit") || "10";
 
     const id = parseInt(idParam);
 
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
     await db.end();
 
     // Parse the layout JSON strings before sending to frontend
-    const parsedRows = (rows as any[]).map(row => ({
+    const parsedRows = (rows as UserLevelRow[]).map((row: UserLevelRow) => ({
       ...row,
       layout: JSON.parse(row.layout)
     }));

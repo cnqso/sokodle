@@ -1,13 +1,13 @@
 import { getDBConnection } from "@/lib/db";
-import { NextRequest, NextResponse } from "next/server";
-import {headers} from "next/headers";
+import { NextResponse } from "next/server";
+// import {headers} from "next/headers";
 
 export async function GET(request) {
   try {
     console.log(request)
     // Extract 'date' parameter from the query string
-    const headersList = await headers();
-    const ip = headersList.get("x-forwarded-for");
+    // const headersList = await headers();
+    // const ip = headersList.get("x-forwarded-for");
     
     const { searchParams } = new URL(request.url);
     const date = searchParams.get("date");

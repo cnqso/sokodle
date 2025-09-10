@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDBConnection } from "@/lib/db";
+import { UserLevelRow } from "@/lib/types";
 
 export async function GET(request: NextRequest) {
   try {
@@ -32,7 +33,7 @@ export async function GET(request: NextRequest) {
     await db.end();
 
     // Parse the layout JSON strings before sending to frontend
-    const parsedRows = (rows as any[]).map(row => ({
+    const parsedRows = (rows as UserLevelRow[]).map((row: UserLevelRow) => ({
       ...row,
       layout: JSON.parse(row.layout)
     }));
