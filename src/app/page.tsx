@@ -43,8 +43,14 @@ export default function Home() {
     fetch(`/api/daily-level?date=${date}`)
       .then((res) => res.json())
       .then((data) => {
-        setLevel(data.layout.rows);
-        setLevelID(data.daily_id);
+        console.log('API Response:', data);
+        if (data.layout) {
+          setLevel(data.layout);
+          setLevelID(data.daily_id);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching daily level:', error);
       });
   }, [date]);
 

@@ -30,7 +30,13 @@ export async function GET(request: NextRequest) {
 
     await db.end();
 
-    return NextResponse.json(rows, { status: 200 });
+    // Parse the layout JSON strings before sending to frontend
+    const parsedRows = (rows as any[]).map(row => ({
+      ...row,
+      layout: JSON.parse(row.layout)
+    }));
+
+    return NextResponse.json(parsedRows, { status: 200 });
   } catch (error) {
     console.error("Error fetching user-submitted levels:", error);
     return NextResponse.json(
