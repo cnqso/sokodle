@@ -17,14 +17,32 @@ export default function StopWatch({
       timerRef.current = window.setInterval(() => {
         setTotalMs(prev => prev + 1);
       }, 10);
-    } else if (playing === "won") {
+    } else if (playing === "notPlaying") {
       if (timerRef.current !== null) {
         clearInterval(timerRef.current);
         timerRef.current = null;
-        setFinalScore({ time: totalMs, steps: moves });
+      }
+      setTotalMs(0);
+    } else {
+      if (timerRef.current !== null) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
       }
     }
-  }, [playing, setFinalScore, moves, totalMs]);
+
+    return () => {
+      if (timerRef.current !== null) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [playing]);
+
+  useEffect(() => {
+    if (playing === "won") {
+      setFinalScore({ time: totalMs, steps: moves });
+    }
+  }, [playing, totalMs, moves, setFinalScore]);
 
   const format = (num: number) => (num < 10 ? `0${num}` : num);
   

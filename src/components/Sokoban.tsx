@@ -42,7 +42,6 @@ export default function Sokoban({
   ]);
   const [currentStep, setCurrentStep] = useState(0);
 
-  // Add this new state near the other useState declarations
   const [showShareModal, setShowShareModal] = useState(false);
 
   // Static elements
