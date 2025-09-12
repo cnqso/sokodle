@@ -28,7 +28,6 @@ export default function Home() {
     fetch(`/api/daily-level?date=${date}`)
       .then((res) => res.json())
       .then((data) => {
-        console.log('API Response:', data);
         if (data.layout) {
           setLevel(data.layout);
           setLevelID(data.daily_id);
@@ -54,7 +53,6 @@ export default function Home() {
   useEffect(() => {
     if (finalScore?.steps && finalScore?.time && levelID) {
       const response = handleSubmit();
-      console.log(response);
     }
   }, [finalScore, handleSubmit, levelID]);
 
@@ -63,8 +61,8 @@ export default function Home() {
       <WelcomeModal />
       <Card className="max-w-max max-width: max-content">
       {level && <CardHeader className="pb-0">
-         <CardTitle className="font-orelo text-2xl">
-            🍒 Sokodle {levelID ? `#${levelID}` : ''} 📦
+         <CardTitle className="font-orelo text-2xl text-center">
+            Sokodle {levelID ? `#${levelID}` : ''}
           </CardTitle>
           <CardDescription>
             Use arrow keys or tap squares to move

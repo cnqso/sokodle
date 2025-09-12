@@ -12,7 +12,6 @@ export async function GET(request) {
     const date = searchParams.get("date");
 
     if (!date) {
-      console.log("Date parameter is required")
       return NextResponse.json({ error: "Date parameter is required" }, { status: 400 });
     }
 
@@ -21,7 +20,6 @@ export async function GET(request) {
     
     await db.end();
     if (rows.length === 0) {
-      console.log("No level found for this date")
       return NextResponse.json({ error: "No level found for this date" }, { status: 404 });
     }
 
@@ -33,8 +31,6 @@ export async function GET(request) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Database error:", error);
-    console.log("Internal Server Error")
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

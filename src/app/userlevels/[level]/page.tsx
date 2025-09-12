@@ -40,7 +40,6 @@ export default function Level({
         throw new Error("Failed to fetch levels");
       }
       const data = await response.json();
-      console.log(data);
       setLevel(data[0]);
     } catch (error) {
       console.error("Error fetching levels:", error);

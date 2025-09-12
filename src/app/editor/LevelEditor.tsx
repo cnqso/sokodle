@@ -40,8 +40,6 @@ export default function LevelEditor() {
   const [submissionStatus, setSubmissionStatus] = useState<
     "notSubmitting" | "submitting" | "submitted"
   >("notSubmitting");
-  // Store JSON version of map data for direct editing.
-  console.log(finalScore)
   const [mapDataString, setMapDataString] = useState(() =>
     JSON.stringify(mapData)
   );

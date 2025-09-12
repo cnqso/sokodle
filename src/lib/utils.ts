@@ -11,8 +11,6 @@ export function formatMilliseconds(ms: number): string {
   const totalSeconds = Math.floor(ms / 100);
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
-  console.log(ms)
-  console.log(seconds)
   
   if (minutes > 0) {
       return `${minutes}m${seconds.toString().padStart(2, '0')}`;

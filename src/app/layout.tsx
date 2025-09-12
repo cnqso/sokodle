@@ -15,8 +15,8 @@ const orelo = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Sokodle - Daily Sokoban Puzzle",
-  description: "A new Sokoban puzzle every day. Push boxes, solve puzzles, share your solutions!",
+  title: "Sokodle - Daily Sokoban",
+  description: "Sokoban puzzle every day. Push boxes and make levels.",
 };
 
 export default function RootLayout({

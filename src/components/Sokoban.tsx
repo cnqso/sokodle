@@ -76,8 +76,12 @@ export default function Sokoban({
     );
     if (allGoalsCovered) {
       setPlaying("won");
+      // Auto-open share modal for daily levels
+      if (context === 'daily') {
+        setShowShareModal(true);
+      }
     }
-  }, [boxes, goals, setPlaying]);
+  }, [boxes, goals, setPlaying, context]);
 
   // Undo functionality
   const handleUndo = useCallback(() => {

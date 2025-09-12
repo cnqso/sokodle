@@ -12,7 +12,6 @@ export async function POST(request: NextRequest) {
       try {
         const countryResponse = await fetch(`https://api.country.is/${ipAddress}`);
         if (countryResponse.ok) {
-          console.log(countryResponse);
           const countryData = await countryResponse.json();
           if (countryData.country) {
             country = countryData.country;

@@ -12,7 +12,6 @@ const orelo = localFont({
 
 export default function UserLevelsPage() {
   const { levels, fetchLevels, loading, hasMore } = useUserLevels();
-  console.log(levels)
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -46,7 +45,7 @@ function LevelPreview({ userLevel, size }: { userLevel: UserLevel, size: number 
   const squareSize = Math.floor(Math.min((size / columns), (size / rows)));
   return (
     <Link className="content-center item-center text-center m-10" href={`/userlevels/${userLevel.user_level_id}`}>
-      <h2 className={`${orelo.className} text-2xl`}>{userLevel.user_name}{" "}{userLevel.user_level_id}</h2>
+      <h2 className={`${orelo.className} text-2xl`}>{userLevel.user_name}</h2>
       <div
         className="grid content-center item-center m-auto" 
         style={{

@@ -1,14 +1,6 @@
 # Sokodle
 
-
-
-
-
 ## TODO
-
-* Get IP regioning working
-* Remove excessive console logs
-* Share button
 * Make 10 levels
 * Post on reddit
 
