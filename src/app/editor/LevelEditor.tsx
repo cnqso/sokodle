@@ -36,7 +36,7 @@ export default function LevelEditor() {
 
   const [testing, setTesting] = useState(false);
   const [playing, setPlaying] = useState<GameState>("notPlaying");
-  const [finalScore, setFinalScore] = useState<FinalScore | null>(null);
+  // const [finalScore, setFinalScore] = useState<FinalScore | null>(null);
   const [submissionStatus, setSubmissionStatus] = useState<
     "notSubmitting" | "submitting" | "submitted"
   >("notSubmitting");
@@ -204,11 +204,11 @@ export default function LevelEditor() {
   async function handleModalSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!levelName.trim()) return;
-    
+
     // Reset any previous errors
     setNameError(null);
     setModerationLoading(true);
-    
+
     try {
       // Check if the level name is appropriate
       const response = await fetch("/api/moderate-level-name", {
@@ -218,21 +218,21 @@ export default function LevelEditor() {
         },
         body: JSON.stringify({ levelName }),
       });
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
         setNameError("Error checking level name. Please try again.");
         setModerationLoading(false);
         return;
       }
-      
+
       if (!data.appropriate) {
         setNameError("Please choose an appropriate level name.");
         setModerationLoading(false);
         return;
       }
-      
+
       // If the name passes moderation, proceed with submission
       handleSubmit(levelName);
     } catch (error) {
@@ -256,7 +256,7 @@ export default function LevelEditor() {
                 Click tiles to change their type
               </CardDescription>
             </div>
-            
+
             <div className="flex flex-wrap items-start sm:items-center gap-4">
               {!testing ? (
                 <>
@@ -293,7 +293,7 @@ export default function LevelEditor() {
                       setTesting(false);
                       setPlaying("notPlaying");
                       setSubmissionStatus("notSubmitting");
-                      setFinalScore(null);
+                      // setFinalScore(null);
                     }}
                   >
                     Back to Editor
@@ -393,7 +393,8 @@ export default function LevelEditor() {
                 mapData={mapData}
                 playing={playing}
                 setPlaying={setPlaying}
-                setFinalScore={setFinalScore}
+                // setFinalScore={setFinalScore}
+                setFinalScore={() => { }}
               />
             </div>
           )}
@@ -409,7 +410,7 @@ export default function LevelEditor() {
                 Give your level a name before submitting it.
               </DialogDescription>
             </DialogHeader>
-            
+
             <div className="py-4">
               <Input
                 id="levelName"
@@ -428,7 +429,7 @@ export default function LevelEditor() {
                 </div>
               )}
             </div>
-            
+
             <DialogFooter>
               <Button
                 type="button"
@@ -437,8 +438,8 @@ export default function LevelEditor() {
               >
                 Cancel
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={!levelName.trim() || moderationLoading}
               >
                 {moderationLoading ? (
