@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { FinalScore, GameState, UserLevel } from "@/lib/types";
+import { getCountryInfo } from "@/lib/utils";
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
 import localFont from 'next/font/local';
@@ -60,7 +61,9 @@ export default function Level({
     });
   }, [level?.user_level_id, finalScore?.steps, finalScore?.time]);
 
-  const countryName = "the USA 🇺🇸";
+  // Get country info from the level data
+  const countryInfo = level?.country ? getCountryInfo(level.country) : getCountryInfo("");
+  const countryDisplay = `${countryInfo.name} ${countryInfo.flag}`;
 
   useEffect(() => {
     fetchLevel();
@@ -84,7 +87,7 @@ export default function Level({
 
         <CardHeader className="pb-0">
           <CardTitle className={orelo.className}>{level?.user_name}</CardTitle>
-          <CardDescription>Made in {countryName}</CardDescription>
+          <CardDescription>Made in {countryDisplay}</CardDescription>
         </CardHeader>
         <CardContent className="px-2">
           {level ? (

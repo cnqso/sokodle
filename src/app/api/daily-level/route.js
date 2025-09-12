@@ -4,7 +4,6 @@ import { NextResponse } from "next/server";
 
 export async function GET(request) {
   try {
-    console.log(request)
     // Extract 'date' parameter from the query string
     // const headersList = await headers();
     // const ip = headersList.get("x-forwarded-for");
@@ -32,7 +31,6 @@ export async function GET(request) {
       layout: JSON.parse(rows[0].layout)
     };
 
-    console.log(result)
     return NextResponse.json(result);
   } catch (error) {
     console.error("Database error:", error);

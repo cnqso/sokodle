@@ -4,10 +4,26 @@ import { getDBConnection } from "@/lib/db";
 
 export async function POST(request: NextRequest) {
   try {
-    // Get IP from headers
     const headersList = await headers();
     const ipAddress = headersList.get("x-forwarded-for") || "Unknown";
-    // Get JSON body from request
+    
+    let country = "";
+    if (ipAddress && ipAddress !== "Unknown") {
+      try {
+        const countryResponse = await fetch(`https://api.country.is/${ipAddress}`);
+        if (countryResponse.ok) {
+          console.log(countryResponse);
+          const countryData = await countryResponse.json();
+          if (countryData.country) {
+            country = countryData.country;
+          }
+        }
+      } catch (countryError) {
+        console.warn("Failed to fetch country for IP:", ipAddress, countryError);
+      }
+    }
+    
+
     const body = await request.json();
     const { user_name, layout } = body;
 
@@ -24,13 +40,14 @@ export async function POST(request: NextRequest) {
     // Insert new row
     // Layout is a JSON column in MySQL. We can store it by stringifying.
     const query = `
-      INSERT INTO user_submitted_levels (user_name, layout, ip_address)
-      VALUES (?, ?, ?)
+      INSERT INTO user_submitted_levels (user_name, layout, ip_address, country)
+      VALUES (?, ?, ?, ?)
     `;
     await db.execute(query, [
       user_name,
       JSON.stringify(layout), // Store JSON as string
       ipAddress,
+      country,
     ]);
 
     // Close DB connection
