@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Sokoban from "@/components/Sokoban";
-import { FinalScore, GameState } from "@/lib/types";
+import { GameState } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/Loader";
 import {

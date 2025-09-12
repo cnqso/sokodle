@@ -52,7 +52,7 @@ export default function Home() {
 
   useEffect(() => {
     if (finalScore?.steps && finalScore?.time && levelID) {
-      const response = handleSubmit();
+      handleSubmit();
     }
   }, [finalScore, handleSubmit, levelID]);
 
