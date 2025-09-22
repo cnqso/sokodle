@@ -13,15 +13,16 @@ function findPlayerStart(mapData: number[][]): Coords {
       }
     }
   }
-  return { x: 0, y: 0 }; // Default position if not found
+  return { x: 0, y: 0 };
 }
 
 export default function Sokoban({
-  mapData, playing, setPlaying, setFinalScore, context = 'user', levelNumber
+  mapData, playing, setPlaying, finalScore, setFinalScore, context = 'user', levelNumber
 }: {
   mapData: number[][];
   playing: GameState;
   setPlaying: React.Dispatch<React.SetStateAction<GameState>>;
+  finalScore: FinalScore | null;
   setFinalScore: React.Dispatch<React.SetStateAction<FinalScore | null>>;
   context?: 'daily' | 'user';
   levelNumber?: number;
@@ -44,7 +45,6 @@ export default function Sokoban({
 
   const [showShareModal, setShowShareModal] = useState(false);
 
-  // Static elements
   const [walls] = useState(() => {
     const w: Coords[] = [];
     mapData.forEach((row, y) => {
@@ -96,9 +96,17 @@ export default function Sokoban({
     setHistory(prev => prev.slice(0, prevStep + 1));
   }, [playing, currentStep, history]);
 
-  /**
-   * Helper to move the player if no boxes are involved in the move.
-   */
+  // Reset functionality
+  const handleReset = useCallback(() => {
+    if (playing === "won") return;
+    // Reset to initial state but keep timer running
+    setPlayerPosition(playerStart);
+    setBoxes(initialBoxes);
+    setHistory([{ player: playerStart, boxes: initialBoxes }]);
+    setCurrentStep(0);
+  }, [playing, playerStart, initialBoxes]);
+
+
   const movePlayerWithoutBoxes = useCallback((newX: number, newY: number) => {
     const newPlayer = { x: newX, y: newY };
   
@@ -122,7 +130,7 @@ export default function Sokoban({
   
     // 1. Check if the next cell is a wall.
     if (walls.some((w) => w.x === newX && w.y === newY)) {
-      return; // Cannot move into walls.
+      return;
     }
 
 
@@ -146,7 +154,7 @@ export default function Sokoban({
         (b) => b.x === currentCheckX && b.y === currentCheckY
       );
       if (boxIndex === -1) {
-        break; // No more boxes in a row.
+        break;
       }
   
       // Add to the chain of boxes.
@@ -211,6 +219,9 @@ export default function Sokoban({
       if (e.key === "z") {
         handleUndo();
         return;
+      } else if (e.key === "r") {
+        handleReset();
+        return;
       } else if (validKeys.includes(e.key)) {
 
         const direction = keyMap[e.key as ArrowKey];
@@ -221,7 +232,7 @@ export default function Sokoban({
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [handleMove, handleUndo, validKeys]);
+  }, [handleMove, handleUndo, handleReset, validKeys]);
 
   // Touch controls
   const handleCellClick = (x: number, y: number) => {
@@ -335,9 +346,9 @@ export default function Sokoban({
           Undo (Z)
         </Button>
       )}
-      {showShareModal && playing === "won" && context === 'daily' && (
+      {showShareModal && playing === "won" && context === 'daily' && finalScore && (
         <ShareModal
-          finalScore={{ time: history.length - 1, steps: history.length - 1 }}
+          finalScore={finalScore}
           onClose={() => setShowShareModal(false)}
           levelNumber={levelNumber}
         />

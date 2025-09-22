@@ -74,6 +74,7 @@ export default function Home() {
               mapData={level}
               playing={playing}
               setPlaying={setPlaying}
+              finalScore={finalScore}
               setFinalScore={setFinalScore}
               context="daily"
               levelNumber={levelID}

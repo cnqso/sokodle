@@ -22,7 +22,7 @@ export function formatMilliseconds(ms: number): string {
 // Country code to flag emoji and name mapping
 const countryMap: Record<string, { name: string; flag: string }> = {
   AD: { name: "Andorra", flag: "🇦🇩" },
-  AE: { name: "United Arab Emirates", flag: "🇦🇪" },
+  AE: { name: "the UAE", flag: "🇦🇪" },
   AF: { name: "Afghanistan", flag: "🇦🇫" },
   AG: { name: "Antigua and Barbuda", flag: "🇦🇬" },
   AI: { name: "Anguilla", flag: "🇦🇮" },
@@ -253,7 +253,7 @@ const countryMap: Record<string, { name: string; flag: string }> = {
   UA: { name: "Ukraine", flag: "🇺🇦" },
   UG: { name: "Uganda", flag: "🇺🇬" },
   UM: { name: "United States Minor Outlying Islands", flag: "🇺🇲" },
-  US: { name: "United States", flag: "🇺🇸" },
+  US: { name: "the United States", flag: "🇺🇸" },
   UY: { name: "Uruguay", flag: "🇺🇾" },
   UZ: { name: "Uzbekistan", flag: "🇺🇿" },
   VA: { name: "Vatican City", flag: "🇻🇦" },
@@ -273,10 +273,8 @@ const countryMap: Record<string, { name: string; flag: string }> = {
 };
 
 export function getCountryInfo(countryCode: string): { name: string; flag: string } {
-  // Convert to uppercase and get country info
   const code = countryCode?.toUpperCase();
   const country = countryMap[code];
   
-  // Return the country info or default to "Online" if not found
   return country || { name: "Online", flag: "🇺🇳" };
 }

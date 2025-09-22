@@ -94,6 +94,7 @@ export default function Level({
               mapData={level.layout}
               playing={playing}
               setPlaying={setPlaying}
+              finalScore={finalScore}
               setFinalScore={setFinalScore}
               context="user"
             />
