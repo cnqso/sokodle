@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Coords, keyMap, Vector, ArrowKey, FinalScore, GameState } from "@/lib/types";
 import Timer from "@/components/Timer";
 import { Button } from "@/components/ui/button";
@@ -27,12 +27,16 @@ export default function Sokoban({
   context?: 'daily' | 'user';
   levelNumber?: number;
 }) {
-  const initialBoxes: Coords[] = [];
-  mapData.forEach((row, y) => {
-    row.forEach((cell, x) => {
-      if (cell === 2) initialBoxes.push({ x, y });
+  const initialBoxes = useMemo(() => {
+    const boxes: Coords[] = [];
+    mapData.forEach((row, y) => {
+      row.forEach((cell, x) => {
+        if (cell === 2) boxes.push({ x, y });
+      });
     });
-  });
+    return boxes;
+  }, [mapData]);
+  
   const playerStart: Coords = findPlayerStart(mapData);
     
   const validKeys = Object.keys(keyMap);

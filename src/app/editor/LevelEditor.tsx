@@ -390,10 +390,12 @@ export default function LevelEditor() {
             <div className="space-y-4">
 
               <Sokoban
+
                 mapData={mapData}
                 playing={playing}
                 setPlaying={setPlaying}
                 // setFinalScore={setFinalScore}
+                finalScore={null}
                 setFinalScore={() => { }}
               />
             </div>
