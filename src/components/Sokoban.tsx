@@ -346,9 +346,14 @@ export default function Sokoban({
           </Button>
         ) : null
       ) : (
-        <Button onClick={handleUndo} className="mt-4 ml-1 mr-auto">
-          Undo (Z)
-        </Button>
+        <div className="flex gap-2 mr-auto">
+          <Button onClick={handleUndo} className="mt-4 ml-1 mr-auto">
+            Undo (Z)
+          </Button>
+                  <Button onClick={handleReset} className="mt-4 ml-1 mr-auto">
+                  Reset (R)
+                </Button>
+        </div>
       )}
       {showShareModal && playing === "won" && context === 'daily' && finalScore && (
         <ShareModal
