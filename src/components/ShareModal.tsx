@@ -18,7 +18,7 @@ export default function ShareModal({
     console.log(finalScore);
     const timeStr = Math.floor(finalScore.time / 6000).toString().padStart(2, '0') + ':' + ((Math.floor(finalScore.time / 100)) % 60).toString().padStart(2, '0') + ':' + (finalScore.time % 100).toString().padStart(2, '0');
     const header = levelNumber ? `Sokodle #${levelNumber}` : 'Sokoban';
-    return `${header} 📦\nTime: ${timeStr}\nMoves: ${finalScore.steps}\n\n📦 Play at: https://sokoban.vercel.app`;
+    return `${header} 📦\nTime: ${timeStr}\nMoves: ${finalScore.steps}\n\n📦 Play at: https://sokodle.cnqso.com`;
   };
 
   const handleShare = async () => {
