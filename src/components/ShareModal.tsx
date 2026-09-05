@@ -18,7 +18,7 @@ export default function ShareModal({
     console.log(finalScore);
     const timeStr = Math.floor(finalScore.time / 6000).toString().padStart(2, '0') + ':' + ((Math.floor(finalScore.time / 100)) % 60).toString().padStart(2, '0') + ':' + (finalScore.time % 100).toString().padStart(2, '0');
     const header = levelNumber ? `Sokodle #${levelNumber}` : 'Sokoban';
-    return `${header} 📦\nTime: ${timeStr}\nMoves: ${finalScore.steps}\n\n📦 Play at: https://sokodle.cnqso.com`;
+    return `${header} ◆\nTime: ${timeStr}\nMoves: ${finalScore.steps}\n\nPlay at: https://sokodle.cnqso.com`;
   };
 
   const handleShare = async () => {
@@ -51,9 +51,9 @@ export default function ShareModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-in fade-in duration-300">
-      <div className="bg-white p-6 rounded-lg max-w-sm w-full mx-4 animate-in zoom-in-95 duration-300 slide-in-from-bottom-4">
-        <h2 className="text-xl font-orelo mb-4 text-center">You won!</h2>
-        <div className="mb-4 p-4 bg-gray-100 rounded whitespace-pre-line font-jetbrains text-sm">
+      <div className="bg-bw p-6 rounded-lg max-w-sm w-full mx-4 animate-in zoom-in-95 duration-300 slide-in-from-bottom-4">
+        <h2 className="text-xl font-display mb-4 text-center">You Win!</h2>
+        <div className="mb-4 p-4 bg-bg rounded whitespace-pre-line font-sans text-sm">
           {generateShareText()}
         </div>
         <div className="flex gap-2">

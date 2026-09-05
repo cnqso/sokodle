@@ -1,9 +1,12 @@
 'use client'
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Coords, keyMap, Vector, ArrowKey, FinalScore, GameState } from "@/lib/types";
+import type { Facing } from "@/components/GuineaPigArt";
 import Timer from "@/components/Timer";
 import { Button } from "@/components/ui/button";
 import ShareModal from "@/components/ShareModal";
+import GameBoard from "@/components/GameBoard";
+import useVictoryFeast from "@/hooks/useVictoryFeast";
 
 function findPlayerStart(mapData: number[][]): Coords {
   for (let y = 0; y < mapData.length; y++) {
@@ -41,9 +44,11 @@ export default function Sokoban({
     
   const validKeys = Object.keys(keyMap);
   const [playerPosition, setPlayerPosition] = useState(playerStart);
+  const [animateMoves, setAnimateMoves] = useState(false);
+  const [facing, setFacing] = useState<Facing>("down");
   const [boxes, setBoxes] = useState(initialBoxes);
   const [history, setHistory] = useState([
-    { player: playerStart, boxes: initialBoxes },
+    { player: playerStart, boxes: initialBoxes, facing: "down" as Facing },
   ]);
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -80,20 +85,26 @@ export default function Sokoban({
     );
     if (allGoalsCovered) {
       setPlaying("won");
-      // Auto-open share modal for daily levels
-      if (context === 'daily') {
-        setShowShareModal(true);
-      }
+
     }
-  }, [boxes, goals, setPlaying, context]);
+  }, [boxes, goals, setPlaying]);
+
+  const { feast } = useVictoryFeast(playing === "won", goals.length);
+  useEffect(() => {
+    if (!feast?.done || context !== "daily") return;
+    const reveal = window.setTimeout(() => setShowShareModal(true), 600);
+    return () => window.clearTimeout(reveal);
+  }, [feast?.done, context]);
 
   // Undo functionality
   const handleUndo = useCallback(() => {
     if (playing !== "playing") return;
     if (currentStep === 0) return;
+    setAnimateMoves(true);
     const prevStep = currentStep - 1;
     const prevState = history[prevStep];
     setPlayerPosition(prevState.player);
+    setFacing(prevState.facing);
     setBoxes(prevState.boxes);
     setCurrentStep(prevStep);
     // Update history to remove the undone moves
@@ -103,20 +114,23 @@ export default function Sokoban({
   // Reset functionality
   const handleReset = useCallback(() => {
     if (playing === "won") return;
+    // Reset snaps home; undo still slides back one move.
+    setAnimateMoves(false);
     // Reset to initial state but keep timer running
     setPlayerPosition(playerStart);
+    setFacing("down");
     setBoxes(initialBoxes);
-    setHistory([{ player: playerStart, boxes: initialBoxes }]);
+    setHistory([{ player: playerStart, boxes: initialBoxes, facing: "down" as Facing }]);
     setCurrentStep(0);
   }, [playing, playerStart, initialBoxes]);
 
 
-  const movePlayerWithoutBoxes = useCallback((newX: number, newY: number) => {
+  const movePlayerWithoutBoxes = useCallback((newX: number, newY: number, nextFacing: Facing) => {
     const newPlayer = { x: newX, y: newY };
   
     setHistory((prev) => {
       const newHistory = prev.slice(0, currentStepRef.current + 1);
-      newHistory.push({ player: newPlayer, boxes: boxes });
+      newHistory.push({ player: newPlayer, boxes: boxes, facing: nextFacing });
       return newHistory;
     });
     setCurrentStep((prev) => prev + 1);
@@ -129,6 +143,9 @@ export default function Sokoban({
       setPlaying("playing");
     }
   
+    setAnimateMoves(true);
+    const nextFacing: Facing = direction.dx < 0 ? "left" : direction.dx > 0 ? "right" : direction.dy < 0 ? "up" : "down";
+    setFacing(nextFacing);
     const newX = playerPosition.x + direction.dx;
     const newY = playerPosition.y + direction.dy;
   
@@ -144,7 +161,7 @@ export default function Sokoban({
   
     // If there is NO box at that cell, we can move freely.
     if (firstBoxIndex === -1) {
-      movePlayerWithoutBoxes(newX, newY);
+      movePlayerWithoutBoxes(newX, newY, nextFacing);
       return;
     }
   
@@ -209,7 +226,7 @@ export default function Sokoban({
     // 7. Update state (player, boxes, history).
     setHistory((prev) => {
       const newHistory = prev.slice(0, currentStepRef.current + 1);
-      newHistory.push({ player: newPlayer, boxes: newBoxes });
+      newHistory.push({ player: newPlayer, boxes: newBoxes, facing: nextFacing });
       return newHistory;
     });
     setCurrentStep((prev) => prev + 1);
@@ -220,13 +237,18 @@ export default function Sokoban({
   // Keyboard controls
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
+      const target = e.target;
+      if (target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
       if (e.key === "z") {
+        e.preventDefault();
         handleUndo();
         return;
       } else if (e.key === "r") {
+        e.preventDefault();
         handleReset();
         return;
       } else if (validKeys.includes(e.key)) {
+        e.preventDefault();
 
         const direction = keyMap[e.key as ArrowKey];
 
@@ -288,59 +310,19 @@ export default function Sokoban({
   return (
     <div className="flex flex-col items-center">
       <Timer playing={playing} moves={history.length} setFinalScore={setFinalScore}/>
-      <div
-        className="grid overflow-hidden font-sans"
-        style={{
-          display: "grid",
-          gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`,
-          gap: "0px",
-          padding: "2px",
-          maxWidth: '100vw',
-        }}
-      >
-        {Array.from({ length: rows }).map((_, y) =>
-          Array.from({ length: cols }).map((_, x) => {
-            const isWall = walls.some((w) => w.x === x && w.y === y);
-            const isGoal = goals.some((g) => g.x === x && g.y === y);
-            const isBox = boxes.some((b) => b.x === x && b.y === y);
-            const boxOnGoal = isBox && isGoal;
-            const isPlayer = playerPosition.x === x && playerPosition.y === y;
-
-            let emoji = " "; // Default floor
-            if (isWall) {
-              emoji = "⬛";
-            } else if (isPlayer) {
-              emoji = "🧍";
-            } else if (isBox) {
-              emoji = boxOnGoal ? "✅" : "📦";
-            } else if (isGoal) {
-              emoji = "🍒";
-            }
-
-            return (
-              <div
-                key={`${x}-${y}`}
-                onClick={() => handleCellClick(x, y)}
-                className="font-sans"
-                style={{
-                  width: cellSize,
-                  height: cellSize,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: `${cellSize * 0.8}px`,
-                  cursor: "pointer",
-                  userSelect: "none",
-                }}
-              >
-                {emoji}
-              </div>
-            );
-          })
-        )}
-      </div>
+      <GameBoard
+        rows={rows} cols={cols} cellSize={cellSize}
+        walls={walls} goals={goals} boxes={boxes}
+        player={playerPosition} facing={facing} animate={animateMoves}
+        feast={feast} onCellClick={handleCellClick} onSwipe={handleMove}
+      />
+      {playing === "won" && (
+        <section className="victory-message">
+          <h2 role="status">You Win!</h2>
+        </section>
+      )}
       {playing === "won" ? (
-        context === 'daily' ? (
+        context === 'daily' && feast?.done ? (
           <Button onClick={() => setShowShareModal(true)} className="mt-4 ml-1 mr-auto">
             Share
           </Button>

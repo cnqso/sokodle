@@ -51,16 +51,10 @@ export default function StopWatch({
   const centiseconds = totalMs % 100;
 
   return (
-    <div className="relative h-12 w-full max-w-[600px] px-4">
+    <div className="relative h-12 w-full max-w-[600px] px-4 tabular-nums font-bold">
       <div className="absolute left-8 top-1/2 -translate-y-1/2 min-w-[100px] text-left">
         {format(minutes)}:{format(seconds)}:{format(centiseconds)}
       </div>
-
-      {playing === "won" && (
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-green-900 font-bold whitespace-nowrap font-orelo">
-          🎉 You Win! 🎉
-        </div>
-      )}
 
       <div className="absolute right-8 top-1/2 -translate-y-1/2 min-w-[80px] text-right">
         {moves - 1} moves

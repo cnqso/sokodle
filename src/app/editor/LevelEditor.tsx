@@ -5,6 +5,7 @@ import Sokoban from "@/components/Sokoban";
 import { GameState } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/Loader";
+import TileSprite, { tileKindFromMapValue } from "@/components/TileSprite";
 import {
   Card,
   CardContent,
@@ -131,10 +132,10 @@ export default function LevelEditor() {
       errors.push(`Must have exactly 1 player, but found ${playerCount}.`);
     }
 
-    // Check #2: boxes >= goals
+    // Check #2: carrots >= bowls
     if (boxCount < goalCount) {
       errors.push(
-        `There must be as many or more boxes (${boxCount}) than goals (${goalCount}).`
+        `There must be as many or more carrots (${boxCount}) than bowls (${goalCount}).`
       );
     }
 
@@ -249,7 +250,7 @@ export default function LevelEditor() {
         <CardHeader className="pb-0">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <CardTitle className="font-orelo text-2xl">
+              <CardTitle className="font-display text-2xl">
                 Level Editor
               </CardTitle>
               <CardDescription>
@@ -352,7 +353,7 @@ export default function LevelEditor() {
               )}
 
               <div
-                className="grid gap-0.5 p-0.5 bg-muted rounded-lg mx-auto"
+                className="sokodle-board grid gap-0 mx-auto"
                 style={{
                   gridTemplateColumns: `repeat(${mapData[0].length}, minmax(40px, 50px))`,
                 }}
@@ -360,24 +361,15 @@ export default function LevelEditor() {
                 {mapData.map((thisRow, y) => {
                   return thisRow.map((_, x) => {
                     const cellValue = mapData[y][x];
-                    const isWall = cellValue === 1;
-                    const isBox = cellValue === 2;
-                    const isGoal = cellValue === 3;
-                    const isPlayer = cellValue === 4;
-
-                    let emoji = " "; // Default floor
-                    if (isWall) emoji = "⬛";
-                    else if (isBox) emoji = "📦";
-                    else if (isGoal) emoji = "🍒";
-                    else if (isPlayer) emoji = "🧍";
+                    const tileKind = tileKindFromMapValue(cellValue);
 
                     return (
                       <div
                         key={`${x}-${y}`}
                         onClick={() => handleCellClick(y, x)}
-                        className="aspect-square flex items-center justify-center text-4xl cursor-pointer bg-background select-none hover:bg-accent transition-colors"
+                        className="aspect-square flex items-center justify-center cursor-pointer select-none overflow-hidden hover:brightness-110 transition-[filter]"
                       >
-                        {emoji}
+                        <TileSprite kind={tileKind} phase={(x + y * 2) % 3} />
                       </div>
                     );
                   });

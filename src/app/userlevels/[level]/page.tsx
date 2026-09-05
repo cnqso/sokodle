@@ -13,13 +13,8 @@ import { FinalScore, GameState, UserLevel } from "@/lib/types";
 import { getCountryInfo } from "@/lib/utils";
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
-import localFont from 'next/font/local';
 import { X } from "lucide-react";
 
-const orelo = localFont({
-  src: '../../../../public/fonts/Orelo-Extended-Trial-Regular-BF674e807573e67.otf', // Adjust this path based on where you place the font file
-  variable: '--font-orelo',
-})
 
 export default function Level({
   params,
@@ -85,7 +80,7 @@ export default function Level({
         </Link>
 
         <CardHeader className="pb-0">
-          <CardTitle className={orelo.className}>{level?.user_name}</CardTitle>
+          <CardTitle className="font-display">{level?.user_name}</CardTitle>
           <CardDescription>Made in {countryDisplay}</CardDescription>
         </CardHeader>
         <CardContent className="px-2">

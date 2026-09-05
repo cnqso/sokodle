@@ -13,6 +13,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { useState } from 'react'
 import { getLocalStorage, setLocalStorage } from '../lib/localStorageHelpers'
+import TileSprite from '@/components/TileSprite'
 
 export default function WelcomeModal() {
     // Local storage key for “Don’t show this again”
@@ -39,35 +40,34 @@ export default function WelcomeModal() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle className={'font-orelo'}>Welcome to Sokodle!</DialogTitle>
+            <DialogTitle className={'font-display'}>Welcome to Sokodle!</DialogTitle>
             <DialogDescription>
-              Sokoban (Japanese for &ldquo;warehouse keeper&rdquo;) is a puzzle
-              game where you must push boxes to their goal without getting stuck.
+              A little guinea pig. A lot of carrots. Push a carrot into every bowl without getting stuck.
             </DialogDescription>
           </DialogHeader>
   
           <div className="space-y-3 py-4">
             <div className="grid grid-cols-[40px,1fr] items-center gap-2">
-              <span className="justify-self-center text-xl">🧍</span>
+              <TileSprite kind="keeper" className="justify-self-center h-8 w-8" />
               <p className="text-sm leading-none">
-                You! Move with arrow keys or tap/click.
+                You, a guinea pig! Swipe anywhere on the board, use arrow keys, or tap an adjacent tile.
               </p>
             </div>
   
             <div className="grid grid-cols-[40px,1fr] items-center gap-2">
-              <span className="justify-self-center text-xl">⬛</span>
-              <p className="text-sm leading-none">Walls block movement.</p>
+              <TileSprite kind="wall" className="justify-self-center h-8 w-8" />
+              <p className="text-sm leading-none">Garden walls block movement.</p>
             </div>
   
             <div className="grid grid-cols-[40px,1fr] items-center gap-2">
-              <span className="justify-self-center text-xl">📦</span>
-              <p className="text-sm leading-none">Push boxes onto goals.</p>
+              <TileSprite kind="cell" className="justify-self-center h-8 w-8" />
+              <p className="text-sm leading-none">Push the carrots.</p>
             </div>
   
             <div className="grid grid-cols-[40px,1fr] items-center gap-2">
-              <span className="justify-self-center text-xl">🍒</span>
+              <TileSprite kind="dock" className="justify-self-center h-8 w-8" />
               <p className="text-sm leading-none">
-                Cherries mark the goal spots.
+                Put a carrot in every bowl.
               </p>
             </div>
   

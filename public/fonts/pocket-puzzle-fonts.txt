@@ -1,0 +1,7 @@
+dynapuff-variable.ttf
+Source: https://raw.githubusercontent.com/google/fonts/main/ofl/dynapuff/DynaPuff%5Bwdth%2Cwght%5D.ttf
+License: dynapuff-OFL.txt
+
+nunitosans-variable.ttf
+Source: https://raw.githubusercontent.com/google/fonts/main/ofl/nunitosans/NunitoSans%5BYTLC%2Copsz%2Cwdth%2Cwght%5D.ttf
+License: nunitosans-OFL.txt

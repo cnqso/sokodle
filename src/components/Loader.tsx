@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
+import TileSprite, { TileKind } from '@/components/TileSprite';
 
 interface LoaderProps {
   width: string;
@@ -7,15 +8,15 @@ interface LoaderProps {
   size: string;
 }
 
-const emojiList = ['🍒', '📦', '🧍', '✨', '🕺'];
+const spriteList: TileKind[] = ['dock', 'cell', 'keeper', 'cell-docked'];
 
 
 const Loader: React.FC<LoaderProps> = ({ width, height, size }) => {
   const [isMounted, setIsMounted] = useState(false);
-  const [randomEmoji, setRandomEmoji] = useState<string>('');
+  const [randomSprite, setRandomSprite] = useState<TileKind>('dock');
   
   useEffect(() => {
-    setRandomEmoji(emojiList[Math.floor(Math.random() * emojiList.length)]);
+    setRandomSprite(spriteList[Math.floor(Math.random() * spriteList.length)]);
     setIsMounted(true);
   }, []);
 
@@ -31,12 +32,12 @@ const Loader: React.FC<LoaderProps> = ({ width, height, size }) => {
       >
         <span
           style={{
-            fontSize: size,
-            animation: 'spin3d 1s linear infinite',
+            width: size,
+            height: size,
             display: 'inline-block',
           }}
         >
-          {randomEmoji}
+          <TileSprite kind={randomSprite} />
         </span>
       </div>
     </div>

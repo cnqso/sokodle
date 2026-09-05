@@ -1,22 +1,25 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono } from "next/font/google";
-import localFont from 'next/font/local';
+import localFont from "next/font/local";
 import "./globals.css";
 import Nav from "@/components/Nav";
 
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains",
-  subsets: ["latin"],
+const bodyFont = localFont({
+  src: "../../public/fonts/nunitosans-variable.ttf",
+  weight: "200 900",
+  variable: "--font-body",
+  display: "swap",
 });
 
-const orelo = localFont({
-  src: '../../public/fonts/Orelo-Extended-Trial-Regular-BF674e807573e67.otf',
-  variable: '--font-orelo',
+const displayFont = localFont({
+  src: "../../public/fonts/dynapuff-variable.ttf",
+  weight: "400 700",
+  variable: "--font-display",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
   title: "Sokodle - Daily Sokoban",
-  description: "Sokoban puzzle every day. Push boxes and make levels.",
+  description: "A new Sokoban puzzle every day. Guide carrots into bowls and make your own levels.",
 };
 
 export default function RootLayout({
@@ -27,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${jetbrainsMono.variable} ${orelo.variable} font-jetbrains antialiased`}
+        className={`${bodyFont.variable} ${displayFont.variable} font-sans antialiased`}
       >
         <div className="flex flex-col min-h-screen items-center">
           <Nav />

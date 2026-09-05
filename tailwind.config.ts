@@ -75,7 +75,8 @@ export default {
 				heading: '800',
 			},
 			fontFamily: {
-				orelo: ['var(--font-orelo)'],
+				display: ['var(--font-display)', 'sans-serif'],
+				sans: ['var(--font-body)', 'sans-serif'],
 			},
 		}
 	},

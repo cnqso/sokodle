@@ -61,11 +61,11 @@ export default function Home() {
       <WelcomeModal />
       <Card className="max-w-max max-width: max-content">
       {level && <CardHeader className="pb-0">
-         <CardTitle className="font-orelo text-2xl text-center">
+         <CardTitle className="font-display text-2xl text-center">
             Sokodle {levelID ? `#${levelID}` : ''}
           </CardTitle>
           <CardDescription>
-            Use arrow keys or tap squares to move
+            Swipe, use arrow keys, or tap a nearby square
           </CardDescription>
         </CardHeader>}
         <CardContent className="px-2">

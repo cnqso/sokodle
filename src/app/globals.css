@@ -3,15 +3,15 @@
 @tailwind utilities;
   
 :root {
-  --main: #88aaee;
+  --main: #b8cc94;
   --overlay: rgba(0, 0, 0, 0.8); /* background color overlay for alert dialogs, modals, etc. */
 
-  --bg: #dfe5f2;
-  --bw: #fff; /* white and secondary black e.g. utility class variant would be: bg-[#fff] dark:bg-[#212121] */
+  --bg: #f4efdf;
+  --bw: #fff9eb; /* white and secondary black e.g. utility class variant would be: bg-[#fff] dark:bg-[#212121] */
   --blank: #000; /* blank black and white */
-  --border: #000;
-  --text: #000;
-  --mtext: #000; /* text that is placed on background with main color e.g. text color of default button */
+  --border: #293c32;
+  --text: #293c32;
+  --mtext: #293c32; /* text that is placed on background with main color e.g. text color of default button */
   --ring: #000;
   --ring-offset: #fff;
 
@@ -24,18 +24,15 @@
   --heading-font-weight: 700;
 
   --shadow: var(--box-shadow-x) var(--box-shadow-y) 0px 0px var(--border);
-  --font-jetbrains: 'JetBrains Mono', monospace;
-  --font-mono: 'JetBrains Mono', monospace;
-  --font-orelo: 'Orelo-SemiWide', system-ui;
 }
 
 .dark {
   --bg: #272933;
   --bw: #212121;
   --blank: #fff;
-  --border: #000;
+  --border: #293c32;
   --text: #e6e6e6;
-  --mtext: #000;
+  --mtext: #293c32;
   --ring: #fff;
   --ring-offset: #000;
 
@@ -54,8 +51,108 @@
 	}
 }
 
+:where(.sokodle-tile) {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  line-height: 0;
+  background: #a4b887;
+}
+
+.sokodle-tile svg, .sokodle-tile-underlay {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Leave the bowl rim visible when the pig stands on a goal. */
+.sokodle-tile-underlay { transform: translateY(9%) scale(1.12); }
+.sokodle-tile--keeper-dock > svg:last-child { transform: translateY(-10%) scale(.84); }
+.sokodle-tile--wall { background: #344d3d; }
+.sokodle-board { border: 3px solid #344d3d; border-radius: 7px; background: #344d3d; }
+
+
+/* One short slide per input. New inputs retarget the current slide immediately. */
+.sokodle-actors { position: absolute; inset: 0; pointer-events: none; }
+.sokodle-actor { position: absolute; top: 0; left: 0; }
+.sokodle-actor-art, .sokodle-actor-art svg { width: 100%; height: 100%; display: block; }
+.sokodle-actor--player { z-index: 1; }
+.sokodle-actor--player [data-on-goal="true"] { transform: translateY(-10%) scale(.84); }
+@media (prefers-reduced-motion: no-preference) {
+  [data-motion="slide"] .sokodle-actor,
+  [data-motion="slide"] .sokodle-actor--player .sokodle-actor-art {
+    transition: transform var(--move-duration) cubic-bezier(.2, .65, .35, 1);
+  }
+}
+
+.squiggle-frame { opacity: 0; }
+.squiggle-frame--0 { opacity: 1; }
+
+@keyframes squiggle-first {
+  0%, 32.999% { opacity: 1; }
+  33%, 100% { opacity: 0; }
+}
+@keyframes squiggle-second {
+  0%, 32.999% { opacity: 0; }
+  33%, 65.999% { opacity: 1; }
+  66%, 100% { opacity: 0; }
+}
+@keyframes squiggle-third {
+  0%, 65.999% { opacity: 0; }
+  66%, 100% { opacity: 1; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .squiggle-frame {
+    animation-duration: .54s;
+    animation-timing-function: steps(1, end);
+    animation-iteration-count: infinite;
+    animation-delay: var(--squiggle-delay, 0s);
+  }
+  .squiggle-frame--0 { animation-name: squiggle-first; }
+  .squiggle-frame--1 { animation-name: squiggle-second; }
+  .squiggle-frame--2 { animation-name: squiggle-third; }
+}
+
+.art-preview { width: min(920px, 100%); padding: 32px 24px 64px; color: #293c32; }
+.art-preview h1 { font-family: var(--font-display); font-size: clamp(28px, 5vw, 42px); margin: 10px 0 16px; }
+.art-preview p { max-width: 640px; line-height: 1.7; font-size: 14px; }
+.art-preview a { text-decoration: underline; text-underline-offset: 4px; }
+.art-specimens { margin-top: 32px; border-top: 1px solid #cbd0b7; }
+.art-specimen { display: grid; grid-template-columns: minmax(100px, 1fr) repeat(4, minmax(36px, 80px)); align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid #cbd0b7; }
+.art-specimen > svg { width: 100%; background: #a4b887; border-radius: 8px; }
+.art-specimen span { font-size: 12px; }
+.art-specimen--header { text-align: center; }
+.art-specimen--header span:first-child { text-align: left; }
+.art-palette { display: flex; gap: 8px; margin: 24px 0; }
+.art-palette span { width: 32px; height: 16px; border-radius: 3px; }
+
 @layer base {
   body {
-    font-family: var(--font-jetbrains);
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
   }
+}
+
+.font-display { font-weight: 600; }
+.victory-message { width: 100%; max-width: 400px; padding: 16px 8px 4px; text-align: center; }
+.victory-message h2 { font-family: var(--font-display); font-weight: 600; font-size: clamp(20px, 5vw, 28px); line-height: 1.2; }
+.sokodle-actor[data-feasting="true"] { transition: none; }
+.feast-sprite { display: block; width: 100%; height: 100%; overflow: visible; }
+@keyframes feast-munch {
+  0%, 100% { transform: translateY(0); }
+  35%, 70% { transform: translateY(3px); }
+}
+@keyframes feast-crumbs {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(4px); }
+}
+.feast-crumbs { opacity: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .feast-munch { animation: feast-munch 140ms steps(2, end); }
+  .feast-crumbs { animation: feast-crumbs 140ms steps(2, end); }
 }
