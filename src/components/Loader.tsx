@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import TileSprite, { TileKind } from '@/components/TileSprite';
+import GuineaPigArt, { type ArtKind } from '@/components/GuineaPigArt';
 
 interface LoaderProps {
   width: string;
@@ -8,12 +8,12 @@ interface LoaderProps {
   size: string;
 }
 
-const spriteList: TileKind[] = ['dock', 'cell', 'keeper', 'cell-docked'];
+const spriteList: ArtKind[] = ['bowl', 'carrot', 'guinea-pig', 'bowl-full'];
 
 
 const Loader: React.FC<LoaderProps> = ({ width, height, size }) => {
   const [isMounted, setIsMounted] = useState(false);
-  const [randomSprite, setRandomSprite] = useState<TileKind>('dock');
+  const [randomSprite, setRandomSprite] = useState<ArtKind>('bowl');
   
   useEffect(() => {
     setRandomSprite(spriteList[Math.floor(Math.random() * spriteList.length)]);
@@ -31,13 +31,14 @@ const Loader: React.FC<LoaderProps> = ({ width, height, size }) => {
         className="flex justify-center items-center"
       >
         <span
+          className="[&_svg]:block [&_svg]:h-full [&_svg]:w-full"
           style={{
             width: size,
             height: size,
             display: 'inline-block',
           }}
         >
-          <TileSprite kind={randomSprite} />
+          <GuineaPigArt kind={randomSprite} />
         </span>
       </div>
     </div>
