@@ -69,9 +69,8 @@
   height: 100%;
 }
 
-/* Leave the bowl rim visible when the pig stands on a goal. */
+/* Keep the bowl visible behind the full-size pig when it stands on a goal. */
 .sokodle-tile-underlay { transform: translateY(9%) scale(1.12); }
-.sokodle-tile--keeper-dock > svg:last-child { transform: translateY(-10%) scale(.84); }
 .sokodle-tile--wall { background: #344d3d; }
 .sokodle-board { border: 3px solid #344d3d; border-radius: 7px; background: #344d3d; }
 
@@ -81,10 +80,8 @@
 .sokodle-actor { position: absolute; top: 0; left: 0; }
 .sokodle-actor-art, .sokodle-actor-art svg { width: 100%; height: 100%; display: block; }
 .sokodle-actor--player { z-index: 1; }
-.sokodle-actor--player [data-on-goal="true"] { transform: translateY(-10%) scale(.84); }
 @media (prefers-reduced-motion: no-preference) {
-  [data-motion="slide"] .sokodle-actor,
-  [data-motion="slide"] .sokodle-actor--player .sokodle-actor-art {
+  [data-motion="slide"] .sokodle-actor {
     transition: transform var(--move-duration) cubic-bezier(.2, .65, .35, 1);
   }
 }

@@ -91,7 +91,7 @@ export default function GameBoard({
             </div>
           ))}
           <div className="sokodle-actor sokodle-actor--player" data-actor="player" data-feasting={!!feastPosition} style={actorStyle(feastPosition ?? player)}>
-            {feast && feastPosition ? <FeastSprite bite={feast.bite} bowl={feast.bowl} done={feast.done} /> : <div className="sokodle-actor-art" data-on-goal={goals.some(goal => samePosition(goal, player))}>
+            {feast && feastPosition ? <FeastSprite bite={feast.bite} bowl={feast.bowl} done={feast.done} /> : <div className="sokodle-actor-art">
               <GuineaPigArt kind="guinea-pig" facing={facing} />
             </div>}
           </div>
