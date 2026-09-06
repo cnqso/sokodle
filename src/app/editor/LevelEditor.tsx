@@ -2,13 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { ArrowRight, Play, Undo2, Eraser, ArrowLeft, Copy, Check, Minus, Plus } from "lucide-react";
+import { ArrowRight, Play, Undo2, Eraser, ArrowLeft, Check, Minus, Plus } from "lucide-react";
 import Sokoban from "@/components/Sokoban";
 import { GameState } from "@/lib/types";
 import DifficultyRating from "@/components/DifficultyRating";
 import GuineaPigArt, { type ArtKind } from "@/components/GuineaPigArt";
 import { CREATOR_NAME_MAX_LENGTH, LEVEL_NAME_MAX_LENGTH, difficultyLabels, type Difficulty } from "@/lib/levelMetadata";
-import { EDITOR_MIN_SIZE, EDITOR_MAX_SIZE, tileLabels, resizeMap, paintTile, parseMap, mapErrors } from "@/lib/editor";
+import { EDITOR_MIN_SIZE, EDITOR_MAX_SIZE, tileLabels, resizeMap, paintTile, mapErrors } from "@/lib/editor";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/Loader";
 import TileSprite, { tileKindFromMapValue } from "@/components/TileSprite";
@@ -33,8 +33,6 @@ export default function LevelEditor() {
   const [testing, setTesting] = useState(false);
   const [playing, setPlaying] = useState<GameState>("notPlaying");
   const [submissionStatus, setSubmissionStatus] = useState<"notSubmitting" | "submitting" | "submitted">("notSubmitting");
-  const [mapDataString, setMapDataString] = useState(JSON.stringify(initialMap));
-  const [copied, setCopied] = useState(false);
   const [verificationErrors, setVerificationErrors] = useState<string[]>([]);
   const [showNameModal, setShowNameModal] = useState(false);
   const [levelName, setLevelName] = useState("");
@@ -58,9 +56,7 @@ export default function LevelEditor() {
     if (remember) setPast(items => [...items.slice(-49), previous]);
     mapRef.current = next;
     setMapData(next);
-    setMapDataString(JSON.stringify(next));
     setVerificationErrors([]);
-    setCopied(false);
     setSubmissionStatus("notSubmitting");
   }
 
@@ -94,11 +90,6 @@ export default function LevelEditor() {
     if (errors.length) return;
     setPlaying("notPlaying");
     setTesting(true);
-  }
-
-  async function copyMap() {
-    try { await navigator.clipboard.writeText(JSON.stringify(mapData)); setCopied(true); }
-    catch { setVerificationErrors(["Couldn't copy. You can select the map text below."]); }
   }
 
   async function handleModalSubmit(e: React.FormEvent) {
@@ -143,7 +134,6 @@ export default function LevelEditor() {
         <section className="rounded-xl border-2 border-border bg-[#b8cc94]/30 p-2 sm:p-4">
           <Sokoban mapData={mapData} playing={playing} setPlaying={setPlaying} finalScore={null} setFinalScore={() => {}} />
           {playing === "won" && <div className="mt-3 flex justify-center gap-3 pb-2">
-            <Button variant="neutral" onClick={copyMap}>{copied ? <Check /> : <Copy />}{copied ? "Copied" : "Copy map"}</Button>
             <Button onClick={() => setShowNameModal(true)} disabled={submissionStatus !== "notSubmitting"}>
               {submissionStatus === "submitted" ? <><Check /> Submitted</> : <>Share level <ArrowRight /></>}
             </Button>
@@ -220,16 +210,6 @@ export default function LevelEditor() {
             {verificationErrors.length > 0 && <div role="alert" className="mt-4 rounded-lg bg-[#f4d7b9] p-3 text-sm">{verificationErrors.map(error => <p key={error}>{error}</p>)}</div>}
           </section>
 
-          <details className="rounded-lg border border-[#293c32]/20 bg-bw p-4 md:col-start-2">
-            <summary className="cursor-pointer text-sm font-bold">Import / export a map</summary>
-            <Label htmlFor="map-data" className="mt-3 block text-xs opacity-70">Map JSON</Label>
-            <textarea id="map-data" value={mapDataString} onChange={event => setMapDataString(event.target.value)} spellCheck={false}
-              className="mt-2 h-28 w-full resize-y rounded border border-[#293c32]/30 bg-bg p-3 font-mono text-xs" />
-            <div className="mt-2 flex gap-3">
-              <Button size="sm" variant="neutral" onClick={() => { try { commit(parseMap(mapDataString)); } catch (error) { setVerificationErrors([error instanceof Error ? error.message : "Couldn't import the map."]); } }}>Import map</Button>
-              <Button size="sm" variant="neutral" onClick={copyMap}>{copied ? <Check /> : <Copy />}{copied ? "Copied" : "Copy map"}</Button>
-            </div>
-          </details>
           <p className="text-sm opacity-70 md:col-start-2">Solve your level before sharing it. <Link className="underline underline-offset-4" href="/userlevels">Browse user levels</Link></p>
         </div>
       )}
