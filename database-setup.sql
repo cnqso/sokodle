@@ -12,6 +12,7 @@
 -- Daily levels table
 CREATE TABLE IF NOT EXISTS daily_levels (
     daily_id INT PRIMARY KEY AUTO_INCREMENT,
+    difficulty TINYINT UNSIGNED NOT NULL DEFAULT 2 CONSTRAINT daily_level_difficulty_range CHECK (difficulty BETWEEN 1 AND 3),
     layout TEXT NOT NULL,
     date_of_level DATE NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -69,55 +70,55 @@ CREATE INDEX IF NOT EXISTS idx_user_attempts_ip ON user_submitted_level_attempts
 -- ========================================
 
 -- Insert today's daily level (basic level from maps.ts)
-INSERT INTO daily_levels (layout, date_of_level) VALUES
-('[[1,1,1,1,1,1,1],[1,3,0,4,3,0,1],[1,1,2,2,1,0,1],[1,0,0,0,0,0,1],[1,1,1,1,1,1,1]]', CURDATE())
-ON DUPLICATE KEY UPDATE layout = VALUES(layout);
+INSERT INTO daily_levels (layout, date_of_level, difficulty) VALUES
+('[[1,1,1,1,1,1,1],[1,3,0,4,3,0,1],[1,1,2,2,1,0,1],[1,0,0,0,0,0,1],[1,1,1,1,1,1,1]]', CURDATE(), 1)
+ON DUPLICATE KEY UPDATE layout = VALUES(layout), difficulty = VALUES(difficulty);
 
 -- Insert tomorrow's daily level (wikipedia level from maps.ts)
-INSERT INTO daily_levels (layout, date_of_level) VALUES
-('[[1,1,1,1,1,1,1,1],[1,1,1,0,0,0,1,1],[1,3,4,2,0,0,1,1],[1,1,1,0,2,3,1,1],[1,3,1,1,2,0,1,1],[1,0,1,0,3,0,1,1],[1,2,3,2,2,2,0,1],[1,0,0,0,3,0,0,1],[1,1,1,1,1,1,1,1]]', DATE_ADD(CURDATE(), INTERVAL 1 DAY))
-ON DUPLICATE KEY UPDATE layout = VALUES(layout);
+INSERT INTO daily_levels (layout, date_of_level, difficulty) VALUES
+('[[1,1,1,1,1,1,1,1],[1,1,1,0,0,0,1,1],[1,3,4,2,0,0,1,1],[1,1,1,0,2,3,1,1],[1,3,1,1,2,0,1,1],[1,0,1,0,3,0,1,1],[1,2,3,2,2,2,0,1],[1,0,0,0,3,0,0,1],[1,1,1,1,1,1,1,1]]', DATE_ADD(CURDATE(), INTERVAL 1 DAY), 2)
+ON DUPLICATE KEY UPDATE layout = VALUES(layout), difficulty = VALUES(difficulty);
 
 -- Insert a few more simple daily levels for the coming days
-INSERT INTO daily_levels (layout, date_of_level) VALUES
+INSERT INTO daily_levels (layout, date_of_level, difficulty) VALUES
 -- Day 3: Simple 3x3 level
-('[[1,1,1],[1,4,1],[1,3,1],[1,2,1],[1,1,1]]', DATE_ADD(CURDATE(), INTERVAL 2 DAY))
-ON DUPLICATE KEY UPDATE layout = VALUES(layout);
+('[[1,1,1],[1,4,1],[1,3,1],[1,2,1],[1,1,1]]', DATE_ADD(CURDATE(), INTERVAL 2 DAY), 2)
+ON DUPLICATE KEY UPDATE layout = VALUES(layout), difficulty = VALUES(difficulty);
 
 -- Day 4: Simple level with multiple boxes
-INSERT INTO daily_levels (layout, date_of_level) VALUES
-('[[1,1,1,1,1],[1,4,0,3,1],[1,0,2,0,1],[1,3,0,4,1],[1,1,1,1,1]]', DATE_ADD(CURDATE(), INTERVAL 3 DAY))
-ON DUPLICATE KEY UPDATE layout = VALUES(layout);
+INSERT INTO daily_levels (layout, date_of_level, difficulty) VALUES
+('[[1,1,1,1,1],[1,4,0,3,1],[1,0,2,0,1],[1,3,0,4,1],[1,1,1,1,1]]', DATE_ADD(CURDATE(), INTERVAL 3 DAY), 2)
+ON DUPLICATE KEY UPDATE layout = VALUES(layout), difficulty = VALUES(difficulty);
 
 -- Day 5: Basic level with wall obstacles
-INSERT INTO daily_levels (layout, date_of_level) VALUES
-('[[1,1,1,1,1,1],[1,4,1,3,0,1],[1,0,1,2,0,1],[1,3,1,0,4,1],[1,0,0,0,0,1],[1,1,1,1,1,1]]', DATE_ADD(CURDATE(), INTERVAL 4 DAY))
-ON DUPLICATE KEY UPDATE layout = VALUES(layout);
+INSERT INTO daily_levels (layout, date_of_level, difficulty) VALUES
+('[[1,1,1,1,1,1],[1,4,1,3,0,1],[1,0,1,2,0,1],[1,3,1,0,4,1],[1,0,0,0,0,1],[1,1,1,1,1,1]]', DATE_ADD(CURDATE(), INTERVAL 4 DAY), 2)
+ON DUPLICATE KEY UPDATE layout = VALUES(layout), difficulty = VALUES(difficulty);
 
 -- Day 6: Another simple level
-INSERT INTO daily_levels (layout, date_of_level) VALUES
-('[[1,1,1,1],[1,4,0,1],[1,2,3,1],[1,0,0,1],[1,1,1,1]]', DATE_ADD(CURDATE(), INTERVAL 5 DAY))
-ON DUPLICATE KEY UPDATE layout = VALUES(layout);
+INSERT INTO daily_levels (layout, date_of_level, difficulty) VALUES
+('[[1,1,1,1],[1,4,0,1],[1,2,3,1],[1,0,0,1],[1,1,1,1]]', DATE_ADD(CURDATE(), INTERVAL 5 DAY), 1)
+ON DUPLICATE KEY UPDATE layout = VALUES(layout), difficulty = VALUES(difficulty);
 
 -- Day 7: Weekend level - slightly more challenging
-INSERT INTO daily_levels (layout, date_of_level) VALUES
-('[[1,1,1,1,1,1,1],[1,4,0,1,0,3,1],[1,0,2,2,2,0,1],[1,3,0,1,0,4,1],[1,1,1,1,1,1,1]]', DATE_ADD(CURDATE(), INTERVAL 6 DAY))
-ON DUPLICATE KEY UPDATE layout = VALUES(layout);
+INSERT INTO daily_levels (layout, date_of_level, difficulty) VALUES
+('[[1,1,1,1,1,1,1],[1,4,0,1,0,3,1],[1,0,2,2,2,0,1],[1,3,0,1,0,4,1],[1,1,1,1,1,1,1]]', DATE_ADD(CURDATE(), INTERVAL 6 DAY), 2)
+ON DUPLICATE KEY UPDATE layout = VALUES(layout), difficulty = VALUES(difficulty);
 
 -- Day 8: Continue with simple levels
-INSERT INTO daily_levels (layout, date_of_level) VALUES
-('[[1,1,1,1,1],[1,4,1,3,1],[1,0,2,0,1],[1,3,1,4,1],[1,1,1,1,1]]', DATE_ADD(CURDATE(), INTERVAL 7 DAY))
-ON DUPLICATE KEY UPDATE layout = VALUES(layout);
+INSERT INTO daily_levels (layout, date_of_level, difficulty) VALUES
+('[[1,1,1,1,1],[1,4,1,3,1],[1,0,2,0,1],[1,3,1,4,1],[1,1,1,1,1]]', DATE_ADD(CURDATE(), INTERVAL 7 DAY), 2)
+ON DUPLICATE KEY UPDATE layout = VALUES(layout), difficulty = VALUES(difficulty);
 
 -- Day 9: Simple corner level
-INSERT INTO daily_levels (layout, date_of_level) VALUES
-('[[1,1,1,1],[1,4,0,1],[1,0,2,1],[1,3,0,1],[1,1,1,1]]', DATE_ADD(CURDATE(), INTERVAL 8 DAY))
-ON DUPLICATE KEY UPDATE layout = VALUES(layout);
+INSERT INTO daily_levels (layout, date_of_level, difficulty) VALUES
+('[[1,1,1,1],[1,4,0,1],[1,0,2,1],[1,3,0,1],[1,1,1,1]]', DATE_ADD(CURDATE(), INTERVAL 8 DAY), 1)
+ON DUPLICATE KEY UPDATE layout = VALUES(layout), difficulty = VALUES(difficulty);
 
 -- Day 10: Basic level with open space
-INSERT INTO daily_levels (layout, date_of_level) VALUES
-('[[1,1,1,1,1],[1,4,0,3,1],[1,0,2,0,1],[1,0,0,0,1],[1,1,1,1,1]]', DATE_ADD(CURDATE(), INTERVAL 9 DAY))
-ON DUPLICATE KEY UPDATE layout = VALUES(layout);
+INSERT INTO daily_levels (layout, date_of_level, difficulty) VALUES
+('[[1,1,1,1,1],[1,4,0,3,1],[1,0,2,0,1],[1,0,0,0,1],[1,1,1,1,1]]', DATE_ADD(CURDATE(), INTERVAL 9 DAY), 1)
+ON DUPLICATE KEY UPDATE layout = VALUES(layout), difficulty = VALUES(difficulty);
 
 -- ========================================
 -- LEGEND FOR LEVEL LAYOUT VALUES:

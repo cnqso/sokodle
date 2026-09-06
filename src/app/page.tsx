@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 
+import DifficultyRating from "@/components/DifficultyRating";
+import { isDifficulty, type Difficulty } from "@/lib/levelMetadata";
 import Sokoban from "@/components/Sokoban";
 import { FinalScore, GameState } from "@/lib/types";
 import WelcomeModal from "@/components/WelcomeModal";
@@ -22,6 +24,7 @@ export default function Home() {
   const date = new Date().toISOString().split("T")[0];
   const [finalScore, setFinalScore] = useState<FinalScore | null>(null);
   const [level, setLevel] = useState<number[][] | null>(null);
+  const [difficulty, setDifficulty] = useState<Difficulty>(2);
   const [levelID, setLevelID] = useState<number | undefined>(undefined);
 
   useEffect(() => {
@@ -31,6 +34,7 @@ export default function Home() {
         if (data.layout) {
           setLevel(data.layout);
           setLevelID(data.daily_id);
+          setDifficulty(isDifficulty(data.difficulty) ? data.difficulty : 2);
         }
       })
       .catch((error) => {
@@ -61,8 +65,9 @@ export default function Home() {
       <WelcomeModal />
       <Card className="w-full">
       {level && <CardHeader className="pb-0">
-         <CardTitle className="font-display text-2xl text-center">
-            Sokodle {levelID ? `#${levelID}` : ''}
+         <CardTitle className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 font-display text-2xl">
+            <span>Sokodle {levelID ? `#${levelID}` : ''}</span>
+            <DifficultyRating value={difficulty} />
           </CardTitle>
           <CardDescription>
             Swipe, use arrow keys, or tap a nearby square

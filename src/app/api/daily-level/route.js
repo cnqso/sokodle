@@ -1,4 +1,6 @@
 import { getDBConnection } from "@/lib/db";
+import { dailyDifficulty } from "@/lib/dailyDifficulty";
+import { isDifficulty } from "@/lib/levelMetadata";
 import { dailyFallbackMaps } from "@/lib/maps";
 import { NextResponse } from "next/server";
 // import {headers} from "next/headers";
@@ -15,6 +17,7 @@ function getFallbackLevel(date) {
 
   return {
     layout: dailyFallbackMaps[fallbackIndex],
+    difficulty: dailyDifficulty(dailyFallbackMaps[fallbackIndex]),
   };
 }
 
@@ -32,17 +35,22 @@ export async function GET(request) {
     }
 
     const db = await getDBConnection();
-    const [rows] = await db.execute("SELECT layout, daily_id FROM daily_levels WHERE date_of_level = ?", [date]);
-    
-    await db.end();
+    let rows;
+    try {
+      [rows] = await db.execute("SELECT layout, daily_id, difficulty FROM daily_levels WHERE date_of_level = ?", [date]);
+    } finally {
+      await db.end();
+    }
     if (rows.length === 0) {
       return NextResponse.json(getFallbackLevel(date));
     }
 
     // Parse the layout JSON string before sending to frontend
+    const layout = typeof rows[0].layout === "string" ? JSON.parse(rows[0].layout) : rows[0].layout;
     const result = {
       ...rows[0],
-      layout: JSON.parse(rows[0].layout)
+      layout,
+      difficulty: isDifficulty(rows[0].difficulty) ? rows[0].difficulty : dailyDifficulty(layout),
     };
 
     return NextResponse.json(result);
