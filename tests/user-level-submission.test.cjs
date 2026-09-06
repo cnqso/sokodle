@@ -6,9 +6,8 @@ const vm = require('node:vm');
 const ts = require('typescript');
 
 // Run the actual TypeScript route and moderation helper with only external I/O replaced.
-function setup({ flags = [false, false], moderationResponse, moderationFailure = false, databaseFailure = false } = {}) {
+function setup({ databaseFailure = false } = {}) {
   const inserted = [];
-  const moderationCalls = [];
   let connections = 0;
   let closed = 0;
   const cache = new Map();
@@ -24,11 +23,6 @@ function setup({ flags = [false, false], moderationResponse, moderationFailure =
     },
     async end() { closed++; },
   };
-  const fakeFetch = async (url, options) => {
-    moderationCalls.push({ url, body: JSON.parse(options.body) });
-    if (moderationFailure) throw new Error('Moderation unavailable');
-    return Response.json(moderationResponse ?? { results: flags.map(flagged => ({ flagged })) });
-  };
   function load(file) {
     const filename = path.resolve(file);
     if (cache.has(filename)) return cache.get(filename).exports;
@@ -38,8 +32,9 @@ function setup({ flags = [false, false], moderationResponse, moderationFailure =
       compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
     }).outputText;
     vm.runInNewContext(code, {
-      module, exports: module.exports, fetch: fakeFetch,
-      process: { env: { OPEN_AI_KEY: 'test-only-key' } },
+      module, exports: module.exports,
+      fetch: () => { assert.fail('Name checks must not call an external API'); },
+      process: { env: {} },
       AbortSignal, URL, console: { error() {} },
       require(id) {
         if (id === '@/lib/db') return { getDBConnection: async () => { connections++; return db; } };
@@ -51,9 +46,12 @@ function setup({ flags = [false, false], moderationResponse, moderationFailure =
   }
   const route = load('src/app/api/submit-level/route.ts');
   return {
-    inserted, moderationCalls,
+    inserted,
     get connections() { return connections; }, get closed() { return closed; },
     submit: body => route.POST(new Request('http://localhost/api/submit-level', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    })),
+    moderate: body => load('src/app/api/moderate-level-name/route.ts').POST(new Request('http://localhost/api/moderate-level-name', {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
     })),
     list: () => load('src/app/api/user-levels/route.ts').GET(new Request('http://localhost/api/user-levels')),
@@ -68,10 +66,6 @@ const valid = {
 test('moderates both trimmed names, persists the credit/rating, and returns them through list and detail', async () => {
   const app = setup();
   assert.equal((await app.submit(valid)).status, 200);
-  assert.deepEqual(app.moderationCalls[0].body, {
-    model: 'omni-moderation-latest', input: ['Carrot Corner', 'GardenPig'],
-  });
-  assert.equal(app.moderationCalls.length, 1);
   assert.equal(app.inserted.length, 1);
   for (const response of [await app.list(), await app.detail()]) {
     assert.equal(response.status, 200);
@@ -85,10 +79,10 @@ test('moderates both trimmed names, persists the credit/rating, and returns them
   assert.equal(app.closed, 3);
 });
 
-for (const [flags, field] of [[[true, false], 'levelName'], [[false, true], 'creatorName']]) {
+for (const [column, field] of [['user_name', 'levelName'], ['creator_name', 'creatorName']]) {
   test(`rejects flagged ${field} even when the editor's preflight is skipped`, async () => {
-    const app = setup({ flags });
-    const response = await app.submit(valid);
+    const app = setup();
+    const response = await app.submit({ ...valid, [column]: 'f.u.c.k' });
     assert.equal(response.status, 400);
     assert.equal((await response.json()).field, field);
     assert.equal(app.connections, 0);
@@ -99,7 +93,6 @@ for (const difficulty of [0, 4, 1.5, '2', null]) {
   test(`rejects invalid difficulty ${JSON.stringify(difficulty)} before moderation or database access`, async () => {
     const app = setup();
     assert.equal((await app.submit({ ...valid, difficulty })).status, 400);
-    assert.equal(app.moderationCalls.length, 0);
     assert.equal(app.connections, 0);
   });
 }
@@ -116,22 +109,24 @@ for (const creator_name of ['', '  ', 'x'.repeat(33), ['GardenPig'], 'line\nbrea
   test(`rejects invalid username ${JSON.stringify(creator_name)}`, async () => {
     const app = setup();
     assert.equal((await app.submit({ ...valid, creator_name })).status, 400);
-    assert.equal(app.moderationCalls.length, 0);
     assert.equal(app.connections, 0);
   });
 }
 
-for (const options of [
-  { moderationFailure: true },
-  { moderationResponse: { results: [] } },
-  { moderationResponse: { results: [{ flagged: false }, {}] } },
-]) {
-  test(`fails closed on unavailable or malformed moderation: ${JSON.stringify(options)}`, async () => {
-    const app = setup(options);
-    assert.equal((await app.submit(valid)).status, 503);
-    assert.equal(app.connections, 0);
-  });
-}
+test('preflight uses the same local filter and identifies the rejected field', async () => {
+  const app = setup();
+  for (const [names, expected] of [
+    [{ levelName: 'Carrot Corner' }, { appropriate: true, field: null }],
+    [{ levelName: 'Carrot Corner', creatorName: 'GardenPig' }, { appropriate: true, field: null }],
+    [{ levelName: 'fuck', creatorName: 'GardenPig' }, { appropriate: false, field: 'levelName' }],
+    [{ levelName: 'Carrot Corner', creatorName: 'f\u200buck' }, { appropriate: false, field: 'creatorName' }],
+  ]) {
+    const response = await app.moderate(names);
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), expected);
+  }
+  assert.equal(app.connections, 0);
+});
 
 test('a failed database save returns an error and closes the connection', async () => {
   const app = setup({ databaseFailure: true });

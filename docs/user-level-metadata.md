@@ -9,10 +9,18 @@ The historical `user_name` database column remains the **level title**;
 `creator_name` is the new, separate credit. Country lookup and display are removed.
 Historical country data is retained.
 
-Both submitted names are checked independently, before insertion, using the
-[OpenAI moderation API](https://developers.openai.com/api/reference/resources/moderations/methods/create).
-A flagged name, unavailable moderation service, or invalid response prevents saving.
-Set `OPEN_AI_KEY` (existing name) or `OPENAI_API_KEY` on the server.
+Both submitted names are checked independently on the server, before insertion,
+using [Obscenity](https://github.com/jo3-l/obscenity). The English preset detects
+profanity and slurs with common character substitutions and repeated letters.
+Matching also normalizes Unicode, removes invisible formatting characters, and
+joins runs of isolated letters such as `f.u.c.k`. Stored display names remain
+unchanged apart from trimming. Built-in word exceptions and a small surname
+allowlist reduce false positives; exceptions do not exempt the rest of a name.
+
+Checks run locally in the Vercel function. No OpenAI/OpenRouter API key, credits,
+or network request is needed. Both the submission route and the retained preflight
+endpoint use the same filter. This is an English profanity heuristic, not contextual
+or comprehensive multilingual moderation. New exceptions should have regression tests.
 
 ## Existing levels
 
