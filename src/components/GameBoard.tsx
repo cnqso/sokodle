@@ -28,7 +28,7 @@ export default function GameBoard({
   onCellClick: (x: number, y: number) => void;
   onSwipe: (direction: Vector) => void;
 }) {
-  const swipeHandlers = useBoardSwipe(onSwipe);
+  const swipeHandlers = useBoardSwipe(onSwipe, onCellClick);
   const [arrivedBoxes, setArrivedBoxes] = useState<(Coords | null)[]>(boxes);
   const previousTargets = useRef(boxes);
 
@@ -59,7 +59,7 @@ export default function GameBoard({
   const feastPosition = feast ? goals[feast.bowl] : undefined;
 
   return (
-    <div {...swipeHandlers} className="sokodle-board p-[2px]" style={{ "--move-duration": `${MOVE_DURATION_MS}ms`, touchAction: "pinch-zoom" } as CSSProperties} data-motion={animate ? "slide" : "snap"}>
+    <div {...swipeHandlers} className="sokodle-board p-[2px]" style={{ "--move-duration": `${MOVE_DURATION_MS}ms`, touchAction: "none", overscrollBehavior: "none" } as CSSProperties} data-motion={animate ? "slide" : "snap"}>
       <div className="relative">
         <div className="grid" style={{ gridTemplateColumns: `repeat(${cols}, ${cellSize}px)` }}>
           {Array.from({ length: rows }, (_, y) =>
