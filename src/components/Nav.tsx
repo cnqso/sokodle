@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils'
 
 export default function Nav() {
   return (
-    <NavigationMenu className="z-[5] m750:max-w-[300px] grow-0 mb-2 mt-2">
+    <NavigationMenu data-site-nav className="z-[5] m750:max-w-[300px] grow-0 mb-2 mt-2">
       <NavigationMenuList className="m750:max-w-[300px]">
         <NavigationMenuItem>
           <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>

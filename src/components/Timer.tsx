@@ -51,14 +51,9 @@ export default function StopWatch({
   const centiseconds = totalMs % 100;
 
   return (
-    <div className="relative h-12 w-full max-w-[600px] px-4 tabular-nums font-bold">
-      <div className="absolute left-8 top-1/2 -translate-y-1/2 min-w-[100px] text-left">
-        {format(minutes)}:{format(seconds)}:{format(centiseconds)}
-      </div>
-
-      <div className="absolute right-8 top-1/2 -translate-y-1/2 min-w-[80px] text-right">
-        {moves - 1} moves
-      </div>
+    <div className="flex h-10 w-full max-w-[500px] items-center justify-between px-1 text-sm tabular-nums">
+      <span aria-label="Elapsed time">{format(minutes)}:{format(seconds)}<span className="text-xs opacity-50">:{format(centiseconds)}</span></span>
+      <span><strong>{moves - 1}</strong> moves</span>
     </div>
   );
 }

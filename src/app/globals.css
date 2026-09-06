@@ -153,3 +153,23 @@
   .feast-munch { animation: feast-munch 140ms steps(2, end); }
   .feast-crumbs { animation: feast-crumbs 140ms steps(2, end); }
 }
+
+/* The game owns touch gestures; browsing and editing keep normal page scroll. */
+html.mobile-game-active { overflow: hidden; overscroll-behavior: none; }
+html.mobile-game-active body { position: fixed; inset: 0; overflow: hidden; overscroll-behavior: none; }
+.game-session { padding-bottom: env(safe-area-inset-bottom, 0px); }
+.editor-tile { touch-action: none; -webkit-user-select: none; user-select: none; }
+.editor-tile:focus-visible { outline: 3px solid #fff1cb; outline-offset: -4px; z-index: 1; }
+.level-card:hover .level-card-arrow { transform: translateX(3px); }
+@media (prefers-reduced-motion: no-preference) {
+  .level-card-arrow { transition: transform 120ms ease; }
+}
+
+@media (max-height: 500px) and (max-width: 1024px) and (orientation: landscape) {
+  html.mobile-game-active [data-site-nav] { display: none; }
+  html.mobile-game-active .level-viewer-page { max-width: 960px; }
+  html.mobile-game-active .level-viewer-shell { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 12px 24px; align-items: start; }
+  html.mobile-game-active .level-viewer-shell > header { grid-column: 1; flex-direction: column; border: 0; }
+  html.mobile-game-active .level-viewer-shell > .game-session { grid-column: 2; grid-row: 1 / span 3; }
+  html.mobile-game-active .level-viewer-shell > p { grid-column: 1; }
+}

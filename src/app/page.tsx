@@ -57,9 +57,9 @@ export default function Home() {
   }, [finalScore, handleSubmit, levelID]);
 
   return (
-    <div>
+    <div className="w-full max-w-[540px] px-2 pb-4">
       <WelcomeModal />
-      <Card className="max-w-max max-width: max-content">
+      <Card className="w-full">
       {level && <CardHeader className="pb-0">
          <CardTitle className="font-display text-2xl text-center">
             Sokodle {levelID ? `#${levelID}` : ''}
@@ -80,7 +80,7 @@ export default function Home() {
               levelNumber={levelID}
             />
           ) : (
-            <Loader width={"400px"} height={"400px"} size={"60px"} />
+            <Loader width={"100%"} height={"400px"} size={"60px"} />
           )}
         </CardContent>
       </Card>

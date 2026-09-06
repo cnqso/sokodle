@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import DifficultyRating from "@/components/DifficultyRating";
 import Sokoban from "@/components/Sokoban";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,13 +20,14 @@ export default function ChallengePage() {
   }
 
   return (
-    <main className="max-w-full px-2 pb-6">
-      <Card className="w-fit max-w-full">
+    <main className="w-full max-w-[620px] px-2 pb-6">
+      <Card className="w-full">
         <CardHeader className="pb-0">
           <div className="flex items-center justify-between gap-4">
             <div>
               <CardTitle className="font-display text-2xl">{level.name}</CardTitle>
-              <CardDescription>{level.difficulty} · 4 carrots</CardDescription>
+              <CardDescription>Made by Codex</CardDescription>
+              <DifficultyRating value={3} />
             </div>
             <Button variant="neutral" size="sm" onClick={startOver}>Start over</Button>
           </div>

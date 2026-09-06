@@ -6,6 +6,9 @@ import Timer from "@/components/Timer";
 import { Button } from "@/components/ui/button";
 import ShareModal from "@/components/ShareModal";
 import GameBoard from "@/components/GameBoard";
+import useMobilePlayLock from "@/hooks/useMobilePlayLock";
+import useBoardSize from "@/hooks/useBoardSize";
+import { Undo2, RotateCcw } from "lucide-react";
 import useVictoryFeast from "@/hooks/useVictoryFeast";
 
 function findPlayerStart(mapData: number[][]): Coords {
@@ -30,6 +33,8 @@ export default function Sokoban({
   context?: 'daily' | 'user';
   levelNumber?: number;
 }) {
+  useMobilePlayLock(playing !== "won");
+  const containerRef = useRef<HTMLDivElement>(null);
   const initialBoxes = useMemo(() => {
     const boxes: Coords[] = [];
     mapData.forEach((row, y) => {
@@ -238,7 +243,7 @@ export default function Sokoban({
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       const target = e.target;
-      if (target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
+      if (target instanceof HTMLElement && (target.closest('[role="dialog"]') || target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
       if (e.key === "z") {
         e.preventDefault();
         handleUndo();
@@ -275,40 +280,10 @@ export default function Sokoban({
   const rows = mapData.length;
   const cols = mapData[0]?.length || 0;
 
-  // Add new state for cell size
-  const [cellSize, setCellSize] = useState(50);
-  
-  // Add resize handler
-  useEffect(() => {
-    const updateCellSize = () => {
-      const containerPadding = 30; // Reduced padding for narrow screens
-      const availableWidth = window.innerWidth - containerPadding;
-      const availableHeight = window.innerHeight - 250; // Increased space for other elements
-      
-      const cols = mapData[0]?.length || 0;
-      const rows = mapData.length;
-      
-      // Calculate cell size based on available space and aspect ratio
-      const cellByWidth = availableWidth / cols;
-      const cellByHeight = availableHeight / rows;
-      
-      // Use the smaller of the two sizes to ensure it fits both dimensions
-      const newSize = Math.min(cellByWidth, cellByHeight);
-      
-      // Cap the size between 16px and 50px
-      setCellSize(Math.min(50, Math.max(16, newSize)));
-    };
-
-    // Initial calculation
-    updateCellSize();
-
-    // Update on resize
-    window.addEventListener('resize', updateCellSize);
-    return () => window.removeEventListener('resize', updateCellSize);
-  }, [mapData]);
+  const cellSize = useBoardSize(containerRef, rows, cols);
 
   return (
-    <div className="flex flex-col items-center">
+    <div ref={containerRef} className="game-session flex w-full min-w-0 flex-col items-center">
       <Timer playing={playing} moves={history.length} setFinalScore={setFinalScore}/>
       <GameBoard
         rows={rows} cols={cols} cellSize={cellSize}
@@ -328,13 +303,13 @@ export default function Sokoban({
           </Button>
         ) : null
       ) : (
-        <div className="flex gap-2 mr-auto">
-          <Button onClick={handleUndo} className="mt-4 ml-1 mr-auto">
-            Undo (Z)
+        <div className="mt-3 flex w-full max-w-[400px] gap-3 px-1 pb-2">
+          <Button onClick={handleUndo} disabled={currentStep === 0} variant="neutral" className="flex-1" aria-label="Undo move">
+            <Undo2 /> Undo <kbd className="hidden text-xs opacity-60 sm:inline">Z</kbd>
           </Button>
-                  <Button onClick={handleReset} className="mt-4 ml-1 mr-auto">
-                  Reset (R)
-                </Button>
+          <Button onClick={handleReset} variant="neutral" className="flex-1" aria-label="Restart level">
+            <RotateCcw /> Restart <kbd className="hidden text-xs opacity-60 sm:inline">R</kbd>
+          </Button>
         </div>
       )}
       {showShareModal && playing === "won" && context === 'daily' && finalScore && (

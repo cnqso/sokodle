@@ -32,6 +32,8 @@ CREATE TABLE IF NOT EXISTS daily_level_attempts (
 CREATE TABLE IF NOT EXISTS user_submitted_levels (
     user_level_id INT PRIMARY KEY AUTO_INCREMENT,
     user_name VARCHAR(255) NOT NULL,
+    creator_name VARCHAR(32) NULL,
+    difficulty TINYINT UNSIGNED NOT NULL DEFAULT 2 CONSTRAINT user_level_difficulty_range CHECK (difficulty BETWEEN 1 AND 3),
     layout TEXT NOT NULL,
     ip_address VARCHAR(45) NOT NULL,
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

@@ -1,92 +1,57 @@
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
-import { UserLevel } from "@/lib/types";
+"use client";
+
+import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from "react";
+import type { UserLevel } from "@/lib/types";
 
 interface UserLevelsContextType {
   levels: UserLevel[];
   fetchLevels: () => void;
   loading: boolean;
+  error: string | null;
   hasMore: boolean;
-  resetLevels: () => void;
+}
+const UserLevelsContext = createContext<UserLevelsContextType | undefined>(undefined);
+export function useUserLevels() {
+  const context = useContext(UserLevelsContext);
+  if (!context) throw new Error("useUserLevels requires UserLevelsProvider");
+  return context;
 }
 
-const UserLevelsContext = createContext<UserLevelsContextType | undefined>(undefined);
-
-export const useUserLevels = () => {
-  const context = useContext(UserLevelsContext);
-  if (!context) {
-    throw new Error("useUserLevels must be used within a UserLevelsProvider");
-  }
-  return context;
-};
-
-export const UserLevelsProvider = ({ children }: { children: ReactNode }) => {
+export function UserLevelsProvider({ children }: { children: ReactNode }) {
   const [levels, setLevels] = useState<UserLevel[]>([]);
-  const [offset, setOffset] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
-  const [mounted, setMounted] = useState(false);
-
-  const resetLevels = () => {
-    setLevels([]);
-    setOffset(0);
-    setHasMore(true);
-    setLoading(false);
-  };
+  const offset = useRef(0);
+  const request = useRef<AbortController | null>(null);
+  const more = useRef(true);
 
   const fetchLevels = useCallback(async () => {
-    if (loading || !mounted) return;
+    if (request.current || !more.current) return;
+    const controller = new AbortController();
+    request.current = controller;
     setLoading(true);
-
+    setError(null);
     try {
-      const response = await fetch(`/api/user-levels?offset=${offset}&limit=10`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch levels");
-      }
+      const response = await fetch(`/api/user-levels?offset=${offset.current}&limit=12`, { signal: controller.signal });
+      if (!response.ok) throw new Error("Couldn't load the levels. Please try again.");
       const data: UserLevel[] = await response.json();
-      
-      setLevels(prev => {
-        // Check for duplicates
-        const newLevels = data.filter(newLevel => 
-          !prev.some(existingLevel => 
-            existingLevel.user_level_id === newLevel.user_level_id
-          )
-        );
-        return [...prev, ...newLevels];
-      });
-
-      if (data.length < 10) {
-        setHasMore(false);
-      }
-      setOffset(prev => prev + 10);
+      if (controller.signal.aborted) return;
+      setLevels(previous => [...previous, ...data.filter(level => !previous.some(item => item.user_level_id === level.user_level_id))]);
+      offset.current += data.length;
+      more.current = data.length === 12;
+      setHasMore(more.current);
     } catch (error) {
-      console.error("Error fetching levels:", error);
+      if (!controller.signal.aborted) setError(error instanceof Error ? error.message : "Couldn't load the levels.");
     } finally {
-      setLoading(false);
+      if (request.current === controller) { request.current = null; setLoading(false); }
     }
-  }, [loading, mounted, offset]);
-
-  // Handle initial mount
-  useEffect(() => {
-    setMounted(true);
-    resetLevels();
-
-    return () => {
-      setMounted(false);
-      resetLevels();
-    };
   }, []);
 
-  // Handle fetching after mount
   useEffect(() => {
-    if (mounted && levels.length === 0) {
-      fetchLevels();
-    }
-  }, [mounted, fetchLevels, levels.length]);
+    void fetchLevels();
+    return () => { request.current?.abort(); request.current = null; };
+  }, [fetchLevels]);
 
-  return (
-    <UserLevelsContext.Provider value={{ levels, fetchLevels, loading, hasMore, resetLevels }}>
-      {children}
-    </UserLevelsContext.Provider>
-  );
-};
-
+  return <UserLevelsContext.Provider value={{ levels, fetchLevels, loading, error, hasMore }}>{children}</UserLevelsContext.Provider>;
+}

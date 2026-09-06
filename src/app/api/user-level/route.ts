@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     const db = await getDBConnection();
 
     const query = `
-      SELECT user_level_id, user_name, layout, country, uploaded_at
+      SELECT user_level_id, user_name, creator_name, difficulty, layout, uploaded_at
       FROM user_submitted_levels
       WHERE user_level_id = ?
     `;
